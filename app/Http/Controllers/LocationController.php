@@ -1,0 +1,153 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\ActivityLog;
+use App\Models\Location;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\View\View;
+
+class LocationController extends Controller implements HasMiddleware
+{
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:locations.view', only: ['index']),
+            new Middleware('permission:locations.create', only: ['create', 'store']),
+            new Middleware('permission:locations.edit', only: ['edit', 'update']),
+            new Middleware('permission:locations.delete', only: ['destroy']),
+        ];
+    }
+
+    /**
+     * Tampilkan daftar lokasi.
+     */
+    public function index(Request $request): View
+    {
+        $query = Location::withCount('commodities');
+
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('building', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by building
+        if ($request->filled('building')) {
+            $query->where('building', $request->building);
+        }
+
+        $locations = $query->orderBy('name')->paginate(15)->withQueryString();
+        $buildings = Location::distinct()->pluck('building')->filter();
+
+        return view('locations.index', compact('locations', 'buildings'));
+    }
+
+    /**
+     * Tampilkan form tambah lokasi.
+     */
+    public function create(): View
+    {
+        return view('locations.create');
+    }
+
+    /**
+     * Simpan lokasi baru.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:20', 'unique:locations,code'],
+            'description' => ['nullable', 'string'],
+            'building' => ['nullable', 'string', 'max:255'],
+            'floor' => ['nullable', 'string', 'max:50'],
+            'room' => ['nullable', 'string', 'max:50'],
+            'is_active' => ['boolean'],
+        ]);
+
+        $validated['is_active'] = $request->boolean('is_active', true);
+
+        $location = Location::create($validated);
+
+        ActivityLog::log('created', "Membuat lokasi: {$location->name}", $location);
+
+        return redirect()->route('locations.index')
+            ->with('success', 'Lokasi berhasil ditambahkan.');
+    }
+
+    /**
+     * Tampilkan form edit lokasi.
+     */
+    public function edit(Location $location): View
+    {
+        return view('locations.edit', compact('location'));
+    }
+
+    /**
+     * Update lokasi.
+     */
+    public function update(Request $request, Location $location)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:20', 'unique:locations,code,' . $location->id],
+            'description' => ['nullable', 'string'],
+            'address' => ['nullable', 'string'],
+            'pic' => ['nullable', 'string', 'max:255'],
+            'building' => ['nullable', 'string', 'max:255'],
+            'floor' => ['nullable', 'string', 'max:50'],
+            'room' => ['nullable', 'string', 'max:50'],
+            'is_active' => ['boolean'],
+        ]);
+
+        $validated['is_active'] = $request->boolean('is_active', true);
+
+        $oldValues = $location->toArray();
+        $location->update($validated);
+
+        ActivityLog::log('updated', "Mengubah lokasi: {$location->name}", $location, $oldValues, $location->toArray());
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Lokasi berhasil diperbarui.']);
+        }
+
+        return redirect()->route('locations.index')
+            ->with('success', 'Lokasi berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus lokasi.
+     */
+    public function destroy(Request $request, Location $location)
+    {
+        // Cek apakah punya barang
+        if ($location->commodities()->exists()) {
+            $errorMsg = 'Lokasi tidak bisa dihapus karena masih memiliki barang.';
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            }
+            return back()->with('error', $errorMsg);
+        }
+
+        $locationName = $location->name;
+        $location->delete();
+
+        ActivityLog::log('deleted', "Menghapus lokasi: {$locationName}");
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Lokasi berhasil dihapus.']);
+        }
+
+        return redirect()->route('locations.index')
+            ->with('success', 'Lokasi berhasil dihapus.');
+    }
+}
