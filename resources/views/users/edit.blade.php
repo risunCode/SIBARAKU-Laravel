@@ -1,7 +1,7 @@
 <x-app-layout title="Edit Pengguna">
     <div class="max-w-2xl">
         <div class="mb-6">
-            <a href="{{ route('users.index') }}" class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
+            <a href="{{ route('users.index') }}" class="text-sm text-gray-600 hover:text-gray-700 flex items-center gap-1">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
@@ -19,11 +19,11 @@
                     <div class="bg-gray-50 rounded-lg p-4">
                         <div class="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                                <span class="text-gray-500">Kode Referral:</span>
+                                <span class="text-gray-600">Kode Referral:</span>
                                 <code class="ml-2 bg-white px-2 py-1 rounded">{{ $user->referral_code }}</code>
                             </div>
                             <div>
-                                <span class="text-gray-500">Direferensikan oleh:</span>
+                                <span class="text-gray-600">Direferensikan oleh:</span>
                                 <span class="ml-2 font-medium">{{ $user->referrer?->name ?? 'Tidak ada' }}</span>
                             </div>
                         </div>

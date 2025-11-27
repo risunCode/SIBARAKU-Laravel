@@ -67,21 +67,30 @@ class CategoryController extends Controller implements HasMiddleware
     /**
      * Simpan kategori baru.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:10', 'unique:categories,code'],
+            'code' => ['nullable', 'string', 'max:10', 'unique:categories,code'],
             'parent_id' => ['nullable', 'exists:categories,id'],
             'description' => ['nullable', 'string'],
             'is_active' => ['boolean'],
         ]);
+
+        // Auto generate code if empty
+        if (empty($validated['code'])) {
+            $validated['code'] = strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $validated['name']), 0, 3)) . rand(100, 999);
+        }
 
         $validated['is_active'] = $request->boolean('is_active', true);
 
         $category = Category::create($validated);
 
         ActivityLog::log('created', "Membuat kategori: {$category->name}", $category);
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Kategori berhasil ditambahkan.']);
+        }
 
         return redirect()->route('categories.index')
             ->with('success', 'Kategori berhasil ditambahkan.');

@@ -27,10 +27,35 @@ class ProfileController extends Controller
     /**
      * Update profil user.
      */
-    public function update(Request $request): RedirectResponse
+    public function update(Request $request)
     {
         $user = Auth::user();
 
+        // Check if this is avatar-only update (from crop modal)
+        $isAvatarOnly = $request->hasFile('avatar') && !$request->has('name');
+
+        if ($isAvatarOnly) {
+            $request->validate([
+                'avatar' => ['required', 'image', 'max:2048'],
+            ]);
+
+            // Hapus avatar lama
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            $user->update([
+                'avatar' => $request->file('avatar')->store('avatars', 'public')
+            ]);
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Foto profil berhasil diperbarui.']);
+            }
+
+            return back()->with('success', 'Foto profil berhasil diperbarui.');
+        }
+
+        // Normal profile update
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],

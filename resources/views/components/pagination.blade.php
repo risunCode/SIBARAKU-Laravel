@@ -9,8 +9,8 @@
     <!-- Per Page Options -->
     <div class="flex items-center gap-4">
         <div class="flex items-center gap-2">
-            <span class="text-sm" style="color: var(--text-secondary);">Tampilkan:</span>
-            <select onchange="changePerPage(this.value)" class="px-3 py-1 text-sm rounded-lg border" style="background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-primary);">
+            <label for="per-page-select" class="text-sm" style="color: var(--text-secondary);">Tampilkan:</label>
+            <select id="per-page-select" onchange="changePerPage(this.value)" class="px-3 py-1 text-sm rounded-lg border" style="background-color: var(--bg-input); border-color: var(--border-color); color: var(--text-primary);">
                 <option value="10" {{ request('per_page', 15) == 10 ? 'selected' : '' }}>10</option>
                 <option value="15" {{ request('per_page', 15) == 15 ? 'selected' : '' }}>15</option>
                 <option value="25" {{ request('per_page', 15) == 25 ? 'selected' : '' }}>25</option>

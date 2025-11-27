@@ -1,17 +1,18 @@
+@section('meta-description', 'Kelola lokasi penyimpanan barang inventaris. Tracking gedung, lantai, ruangan, dan PIC untuk manajemen aset yang terstruktur.')
 <x-app-layout title="Lokasi">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
             <h2 class="text-xl font-bold text-gray-900">Daftar Lokasi</h2>
-            <p class="text-sm text-gray-500">Kelola lokasi penyimpanan barang</p>
+            <p class="text-sm text-gray-600">Kelola lokasi penyimpanan barang</p>
         </div>
 
         @can('locations.create')
-        <a href="{{ route('locations.create') }}" class="btn btn-primary">
+        <button onclick="openCreateModal()" class="btn btn-primary">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
             Tambah Lokasi
-        </a>
+        </button>
         @endcan
     </div>
 
@@ -41,6 +42,7 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th class="w-12">No</th>
                         <th>Kode</th>
                         <th>Nama</th>
                         <th>Gedung</th>
@@ -51,8 +53,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($locations as $location)
+                    @forelse($locations as $index => $location)
                     <tr>
+                        <td class="text-gray-500">{{ $locations->firstItem() + $index }}</td>
                         <td class="font-mono">{{ $location->code }}</td>
                         <td class="font-medium">{{ $location->name }}</td>
                         <td class="text-gray-500">{{ $location->building ?? '-' }}</td>
@@ -83,7 +86,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center text-gray-500 py-8">Belum ada data lokasi</td>
+                        <td colspan="8" class="text-center text-gray-500 py-8">Belum ada data lokasi</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -95,6 +98,43 @@
         </div>
         @endif
     </div>
+    <!-- Create Modal -->
+    <x-modal name="createModal" title="Tambah Lokasi" maxWidth="md">
+        <form id="createForm" action="{{ route('locations.store') }}" method="POST">
+            @csrf
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Nama Lokasi</label>
+                    <input type="text" name="name" id="createName" class="input" autocomplete="organization" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Kode</label>
+                    <input type="text" name="code" id="createCode" class="input" autocomplete="off" placeholder="Otomatis jika kosong">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Deskripsi</label>
+                    <textarea name="description" id="createDescription" class="input" rows="2" autocomplete="off"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Alamat</label>
+                    <textarea name="address" id="createAddress" class="input" rows="2" autocomplete="street-address"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">PIC</label>
+                    <input type="text" name="pic" id="createPic" class="input" autocomplete="name" placeholder="Person in Charge">
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" name="is_active" id="createIsActive" value="1" class="rounded" checked>
+                    <label for="createIsActive" class="text-sm" style="color: var(--text-primary);">Aktif</label>
+                </div>
+            </div>
+            <div class="flex gap-2 mt-6">
+                <button type="button" onclick="closeModal('createModal')" class="btn btn-outline flex-1">Batal</button>
+                <button type="submit" class="btn btn-primary flex-1">Simpan</button>
+            </div>
+        </form>
+    </x-modal>
+
     <!-- Edit Modal -->
     <div id="editModal-backdrop" class="modal-backdrop"></div>
     <div id="editModal" class="modal-content w-full max-w-md rounded-xl p-6" style="background-color: var(--bg-card);">
@@ -110,23 +150,23 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Nama Lokasi</label>
-                    <input type="text" name="name" id="editName" class="input" required>
+                    <input type="text" name="name" id="editName" class="input" autocomplete="organization" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Kode</label>
-                    <input type="text" name="code" id="editCode" class="input">
+                    <input type="text" name="code" id="editCode" class="input" autocomplete="off">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Deskripsi</label>
-                    <textarea name="description" id="editDescription" class="input" rows="3"></textarea>
+                    <textarea name="description" id="editDescription" class="input" rows="2" autocomplete="off"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Alamat</label>
-                    <textarea name="address" id="editAddress" class="input" rows="2"></textarea>
+                    <textarea name="address" id="editAddress" class="input" rows="2" autocomplete="street-address"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">PIC</label>
-                    <input type="text" name="pic" id="editPic" class="input">
+                    <input type="text" name="pic" id="editPic" class="input" autocomplete="name">
                 </div>
                 <div class="flex items-center gap-2">
                     <input type="checkbox" name="is_active" id="editIsActive" value="1" class="rounded">
@@ -141,6 +181,12 @@
     </div>
 
     <script>
+        function openCreateModal() {
+            document.getElementById('createForm').reset();
+            document.getElementById('createIsActive').checked = true;
+            openModal('createModal');
+        }
+
         function openEditModal(location) {
             document.getElementById('editForm').action = `/master/locations/${location.id}`;
             document.getElementById('editName').value = location.name || '';

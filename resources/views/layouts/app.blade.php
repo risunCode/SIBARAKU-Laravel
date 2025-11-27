@@ -6,6 +6,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $title ?? 'Dashboard' }} - {{ config('app.name', 'Inventaris Barang') }}</title>
+    
+    <!-- Meta Description -->
+    <meta name="description" content="@yield('meta-description', 'Sistem inventaris barang untuk mengelola aset perusahaan dengan mudah dan efisien. Lacak, kelola, dan pantau semua barang inventaris dalam satu platform.')">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -36,11 +39,7 @@
             
             <!-- Logo -->
             <div class="flex items-center gap-3 h-16 px-6 border-b border-gray-200">
-                <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                    </svg>
-                </div>
+                <img src="/images/logo-pbj-kalbar.png?v={{ time() }}" alt="Logo" class="w-8 h-8 object-contain">
                 <span class="font-semibold text-gray-900">Inventaris</span>
             </div>
 
@@ -146,8 +145,8 @@
             <!-- Top Navigation -->
             <header class="sticky top-0 z-30 bg-white border-b border-gray-200">
                 <div class="flex items-center justify-between h-16 px-4 sm:px-6">
-                    <!-- Mobile menu button -->
-                    <button @click="sidebarOpen = true" class="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100">
+                    <!-- Mobile menu button - Only on mobile -->
+                    <button @click="sidebarOpen = true" class="block lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                         </svg>
@@ -222,17 +221,5 @@
     </div>
 
     @stack('scripts')
-
-    <!-- Auto-hide flash messages -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            @if(session('success'))
-                showSuccess('{{ session('success') }}');
-            @endif
-            @if(session('error'))
-                showError('{{ session('error') }}');
-            @endif
-        });
-    </script>
 </body>
 </html>

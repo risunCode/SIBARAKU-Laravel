@@ -38,6 +38,7 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th class="w-12">No</th>
                         <th>Barang</th>
                         <th>Jenis Maintenance</th>
                         <th>Tanggal</th>
@@ -48,8 +49,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($maintenanceLogs as $log)
+                    @forelse($maintenanceLogs as $index => $log)
                     <tr>
+                        <td class="text-gray-500">{{ $maintenanceLogs->firstItem() + $index }}</td>
                         <td>
                             <a href="{{ route('commodities.show', $log->commodity) }}" class="text-primary-600 hover:underline">
                                 {{ Str::limit($log->commodity->name, 25) }}
@@ -82,7 +84,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center text-gray-500 py-8">Belum ada data maintenance</td>
+                        <td colspan="8" class="text-center text-gray-500 py-8">Belum ada data maintenance</td>
                     </tr>
                     @endforelse
                 </tbody>

@@ -62,7 +62,7 @@
     --border-color: #e2e8f0;
     --accent-color: #2563eb;
     --sidebar-text: #ffffff;
-    --sidebar-text-muted: #94a3b8;
+    --sidebar-text-muted: #cbd5e1;
     --sidebar-hover: rgba(255,255,255,0.1);
     --sidebar-active: rgba(255,255,255,0.15);
 }
@@ -80,7 +80,7 @@
     --accent-color: #3b82f6;
     --accent-light: #60a5fa;
     --sidebar-text: #f5f5f5;
-    --sidebar-text-muted: #a3a3a3;
+    --sidebar-text-muted: #d4d4d4;
     --sidebar-hover: rgba(255,255,255,0.05);
     --sidebar-active: rgba(255,255,255,0.1);
 }

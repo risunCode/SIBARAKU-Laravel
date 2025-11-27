@@ -10,7 +10,7 @@
             <h2 class="text-2xl font-bold mt-2" style="color: var(--text-primary);">Tambah Barang Baru</h2>
         </div>
 
-        <form action="{{ route('commodities.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6" onsubmit="return handleFormSubmit(this, event)">
+        <form action="{{ route('commodities.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             
             <!-- Grid Layout: 2 Kolom Utama -->
@@ -65,7 +65,18 @@
                         </div>
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
                             <x-form.input label="Tahun Perolehan" name="purchase_year" type="number" min="1900" max="{{ date('Y') }}" placeholder="{{ date('Y') }}" />
-                            <x-form.input label="Harga Perolehan (Rp)" name="purchase_price" type="number" min="0" placeholder="0" />
+                            <div>
+                                <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Harga Perolehan</label>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm" style="color: var(--text-secondary);">Rp</span>
+                                    <input type="text" id="purchase_price_display" 
+                                           class="input pl-10" 
+                                           placeholder="0"
+                                           oninput="formatRupiahInput(this)"
+                                           onchange="updatePriceHidden(this)">
+                                    <input type="hidden" name="purchase_price" id="purchase_price" value="{{ old('purchase_price', 0) }}">
+                                </div>
+                            </div>
                             <x-form.input label="Jumlah" name="quantity" type="number" min="1" value="1" required />
                         </div>
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
@@ -117,4 +128,32 @@
             </div>
         </form>
     </div>
+
+    @push('scripts')
+    <script>
+        function formatRupiahInput(input) {
+            // Remove non-digits
+            let value = input.value.replace(/\D/g, '');
+            // Format with dots
+            value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            input.value = value;
+            // Update hidden field
+            updatePriceHidden(input);
+        }
+        
+        function updatePriceHidden(input) {
+            const numericValue = input.value.replace(/\./g, '');
+            document.getElementById('purchase_price').value = numericValue || 0;
+        }
+
+        // Initialize on page load if there's old value
+        document.addEventListener('DOMContentLoaded', function() {
+            const hiddenPrice = document.getElementById('purchase_price');
+            const displayPrice = document.getElementById('purchase_price_display');
+            if (hiddenPrice.value && hiddenPrice.value > 0) {
+                displayPrice.value = parseInt(hiddenPrice.value).toLocaleString('id-ID');
+            }
+        });
+    </script>
+    @endpush
 </x-app-layout>

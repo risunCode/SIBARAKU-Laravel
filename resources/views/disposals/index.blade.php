@@ -40,6 +40,7 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th class="w-12">No</th>
                         <th>No. Pengajuan</th>
                         <th>Barang</th>
                         <th>Alasan</th>
@@ -51,8 +52,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($disposals as $disposal)
+                    @forelse($disposals as $index => $disposal)
                     <tr>
+                        <td class="text-gray-500">{{ $disposals->firstItem() + $index }}</td>
                         <td class="font-mono text-xs">{{ $disposal->disposal_number }}</td>
                         <td>
                             <a href="{{ route('commodities.show', $disposal->commodity) }}" class="text-primary-600 hover:underline">
@@ -72,7 +74,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="text-center text-gray-500 py-8">Belum ada pengajuan penghapusan</td>
+                        <td colspan="9" class="text-center text-gray-500 py-8">Belum ada pengajuan penghapusan</td>
                     </tr>
                     @endforelse
                 </tbody>

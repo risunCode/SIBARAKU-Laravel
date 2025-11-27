@@ -1,3 +1,4 @@
+@section('meta-description', 'Manajemen pengguna sistem inventaris dengan role-based access control. Kontrol akses berbasis peran untuk keamanan dan efisiensi manajemen.')
 <x-app-layout title="Pengguna">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
@@ -53,6 +54,7 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th class="w-12">No</th>
                         <th>Pengguna</th>
                         <th>Kode Referral</th>
                         <th>Direferensikan Oleh</th>
@@ -62,14 +64,15 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($users as $user)
+                    @forelse($users as $index => $user)
                     <tr>
+                        <td class="text-gray-600">{{ $users->firstItem() + $index }}</td>
                         <td>
                             <div class="flex items-center gap-3">
-                                <img src="{{ $user->avatar_url }}" class="w-10 h-10 rounded-full object-cover" alt="{{ $user->name }}">
+                                <img src="{{ $user->avatar_url }}" class="w-10 h-10 rounded-full object-cover cursor-pointer hover:opacity-80" alt="{{ $user->name }}" onclick="viewImage('{{ $user->avatar_url }}', '{{ $user->name }}')">
                                 <div>
                                     <p class="font-medium text-gray-900">{{ $user->name }}</p>
-                                    <p class="text-xs text-gray-500">{{ $user->email }}</p>
+                                    <p class="text-xs text-gray-600">{{ $user->email }}</p>
                                 </div>
                             </div>
                         </td>
@@ -78,14 +81,14 @@
                                 <code class="text-xs bg-gray-100 px-2 py-1 rounded">{{ $user->referral_code }}</code>
                                 <button type="button" 
                                         onclick="copyToClipboard('{{ url('register?ref=' . $user->referral_code) }}')"
-                                        class="text-gray-400 hover:text-primary-600" title="Salin Link Referral">
+                                        class="text-gray-600 hover:text-primary-600" title="Salin Link Referral">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                     </svg>
                                 </button>
                             </div>
                         </td>
-                        <td class="text-gray-500">
+                        <td class="text-gray-600">
                             {{ $user->referrer?->name ?? '-' }}
                         </td>
                         <td>
@@ -126,7 +129,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center text-gray-500 py-8">Belum ada data pengguna</td>
+                        <td colspan="7" class="text-center text-gray-600 py-8">Belum ada data pengguna</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -153,23 +156,23 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Nama</label>
-                    <input type="text" name="name" id="createName" class="input" required>
+                    <input type="text" name="name" id="createName" class="input" autocomplete="name" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Email</label>
-                    <input type="email" name="email" id="createEmail" class="input" required>
+                    <input type="email" name="email" id="createEmail" class="input" autocomplete="email" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">No. Telepon</label>
-                    <input type="text" name="phone" id="createPhone" class="input">
+                    <input type="text" name="phone" id="createPhone" class="input" autocomplete="tel">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Password</label>
-                    <input type="password" name="password" id="createPassword" class="input" required>
+                    <input type="password" name="password" id="createPassword" class="input" autocomplete="new-password" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Konfirmasi Password</label>
-                    <input type="password" name="password_confirmation" id="createPasswordConfirmation" class="input" required>
+                    <input type="password" name="password_confirmation" id="createPasswordConfirmation" class="input" autocomplete="new-password" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Role</label>
@@ -181,7 +184,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Kode Referral <span class="text-xs text-gray-500">(opsional)</span></label>
+                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Kode Referral <span class="text-xs text-gray-600">(opsional)</span></label>
                     <input type="text" name="referral_code" id="createReferralCode" class="input" placeholder="Masukkan kode referral">
                 </div>
                 <div class="flex items-center gap-2">
@@ -211,15 +214,15 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Nama</label>
-                    <input type="text" name="name" id="editName" class="input" required>
+                    <input type="text" name="name" id="editName" class="input" autocomplete="name" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Email</label>
-                    <input type="email" name="email" id="editEmail" class="input" required>
+                    <input type="email" name="email" id="editEmail" class="input" autocomplete="email" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">No. Telepon</label>
-                    <input type="text" name="phone" id="editPhone" class="input">
+                    <input type="text" name="phone" id="editPhone" class="input" autocomplete="tel">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Role</label>
@@ -293,5 +296,6 @@
                 form.submit();
             }
         }
+
     </script>
 </x-app-layout>

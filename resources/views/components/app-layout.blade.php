@@ -34,17 +34,13 @@
             <!-- Logo -->
             <div class="flex items-center justify-between h-16 px-4 border-b border-white/10">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
-                    <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-white/20">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                        </svg>
-                    </div>
+                    <img src="/images/logo-pbj-kalbar.png?v={{ time() }}" alt="Logo" width="24" height="24" class="w-6 h-6 object-contain">
                     <div>
                         <span class="font-bold text-white text-lg">SIBARANG</span>
                         <p class="text-[10px] text-white/60 -mt-1">Menu Aplikasi</p>
                     </div>
                 </a>
-                <button @click="sidebarOpen = false" class="lg:hidden text-white/70 hover:text-white">
+                <button @click="sidebarOpen = false" class="lg:hidden text-white/70 hover:text-white" aria-label="Tutup Menu" title="Tutup Menu">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
@@ -188,8 +184,8 @@
             <!-- Navbar - Sticky -->
             <header class="sticky top-0 z-30 flex items-center justify-between px-6 py-4 border-b" style="background-color: var(--bg-card); border-color: var(--border-color);">
                 <div class="flex items-center gap-4">
-                    <!-- Mobile Menu Toggle -->
-                    <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden p-2 rounded-lg transition-colors hover:opacity-80" style="color: var(--text-primary); background-color: var(--bg-input);">
+                    <!-- Mobile Menu Toggle - Only on mobile -->
+                    <button @click="sidebarOpen = !sidebarOpen" class="block lg:hidden p-2 rounded-lg transition-colors hover:opacity-80" style="color: var(--text-primary); background-color: var(--bg-input);" aria-label="Buka Menu" title="Buka Menu">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                         </svg>
@@ -197,8 +193,8 @@
                     
                     <!-- Logos -->
                     <div class="flex items-center gap-3">
-                        <img src="{{ asset('images/logo-kab.png') }}" alt="Logo Kabupaten" class="h-10 w-auto" onerror="this.style.display='none'">
-                        <img src="{{ asset('images/logo-pbj-kalbar.png') }}" alt="Logo PBJ Kalbar" class="h-10 w-auto" onerror="this.style.display='none'">
+                        <img src="{{ asset('images/logo-kab.png') }}" alt="Logo Kabupaten" width="40" height="40" class="h-10 w-auto object-contain" onerror="this.style.display='none'">
+                        <img src="{{ asset('images/logo-pbj-kalbar.png') }}" alt="Logo PBJ Kalbar" width="40" height="40" class="h-10 w-auto object-contain" onerror="this.style.display='none'">
                         <div class="border-l pl-3 hidden sm:block" style="border-color: var(--border-color);">
                             <h1 class="text-sm font-semibold" style="color: var(--text-primary);">Sistem Inventaris Barang</h1>
                             <p class="text-xs" style="color: var(--text-secondary);">Kabupaten Kubu Raya</p>
@@ -243,11 +239,11 @@
 
                     <!-- Notifications -->
                     <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" class="p-2 rounded-lg hover:opacity-80 relative" style="color: var(--text-secondary);">
+                        <button @click="open = !open" class="p-2 rounded-lg hover:opacity-80 relative" style="color: var(--text-secondary);" aria-label="Notifikasi" title="Notifikasi">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                             </svg>
-                            @if(auth()->user()->unreadNotifications->count() > 0)
+                            @if(auth()->check() && auth()->user()->unreadNotifications->count() > 0)
                             <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                             @endif
                         </button>
@@ -257,7 +253,7 @@
                                 <a href="{{ route('notifications.index') }}" class="text-xs hover:underline" style="color: var(--accent-color);">Lihat Semua</a>
                             </div>
                             <div class="max-h-64 overflow-y-auto">
-                                @forelse(auth()->user()->unreadNotifications->take(5) as $notif)
+                                @forelse(auth()->check() ? auth()->user()->unreadNotifications->take(5) : [] as $notif)
                                 <div class="p-3 border-b" style="border-color: var(--border-color);">
                                     <p class="text-sm" style="color: var(--text-primary);">{{ $notif->data['title'] ?? 'Notifikasi' }}</p>
                                     <p class="text-xs" style="color: var(--text-secondary);">{{ $notif->created_at->diffForHumans() }}</p>
@@ -271,7 +267,7 @@
 
                     <!-- User Dropdown -->
                     <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" class="flex items-center gap-2 p-1 rounded-lg hover:opacity-80" style="background-color: var(--bg-input);">
+                        <button @click="open = !open" class="flex items-center gap-2 p-1 rounded-lg hover:opacity-80" style="background-color: var(--bg-input);" aria-label="Profil Pengguna" title="Profil Pengguna">
                             <img src="{{ auth()->user()->avatar_url }}" class="w-8 h-8 rounded-full object-cover" alt="">
                             <div class="hidden sm:block text-left">
                                 <p class="text-sm font-medium" style="color: var(--text-primary);">{{ auth()->user()->name }}</p>
@@ -659,7 +655,9 @@
             
             if (isImage) {
                 zoomControls.classList.remove('hidden');
-                content.innerHTML = `<img src="${file.url}" class="max-w-full max-h-[70vh] rounded-lg shadow-2xl transition-transform duration-100 cursor-zoom-in select-none" id="gallery-img" draggable="false">`;
+                // Sanitize file.url before using in innerHTML
+                const sanitizedUrl = file.url.replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                content.innerHTML = `<img src="${sanitizedUrl}" class="max-w-full max-h-[70vh] rounded-lg shadow-2xl transition-transform duration-100 cursor-zoom-in select-none" id="gallery-img" draggable="false">`;
                 applyZoom();
                 
                 const img = document.getElementById('gallery-img');

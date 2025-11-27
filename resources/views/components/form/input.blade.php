@@ -7,6 +7,7 @@
     'disabled' => false,
     'placeholder' => '',
     'helper' => null,
+    'autocomplete' => null,
 ])
 
 <div {{ $attributes->only('class')->merge(['class' => '']) }}>
@@ -27,6 +28,7 @@
         placeholder="{{ $placeholder }}"
         {{ $required ? 'required' : '' }}
         {{ $disabled ? 'disabled' : '' }}
+        {{ $autocomplete ? "autocomplete=\"{$autocomplete}\"" : '' }}
         {{ $attributes->except('class')->merge(['class' => 'form-input']) }}
     >
 

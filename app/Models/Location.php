@@ -14,6 +14,8 @@ class Location extends Model
         'name',
         'code',
         'description',
+        'address',
+        'pic',
         'building',
         'floor',
         'room',

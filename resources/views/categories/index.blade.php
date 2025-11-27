@@ -1,17 +1,18 @@
+@section('meta-description', 'Kelola kategori barang inventaris dengan sistem hierarki. Organisir aset perusahaan berdasarkan jenis dan fungsi untuk tracking yang lebih efisien.')
 <x-app-layout title="Kategori">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
             <h2 class="text-xl font-bold text-gray-900">Daftar Kategori</h2>
-            <p class="text-sm text-gray-500">Kelola kategori barang inventaris</p>
+            <p class="text-sm text-gray-600">Kelola kategori barang inventaris</p>
         </div>
 
         @can('categories.create')
-        <a href="{{ route('categories.create') }}" class="btn btn-primary">
+        <button onclick="openCreateModal()" class="btn btn-primary">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
             Tambah Kategori
-        </a>
+        </button>
         @endcan
     </div>
 
@@ -52,6 +53,7 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th class="w-12">No</th>
                         <th>Kode</th>
                         <th>Nama</th>
                         <th>Parent</th>
@@ -61,8 +63,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($categories as $category)
+                    @forelse($categories as $index => $category)
                     <tr>
+                        <td class="text-gray-500">{{ $categories->firstItem() + $index }}</td>
                         <td class="font-mono">{{ $category->code }}</td>
                         <td class="font-medium">{{ $category->name }}</td>
                         <td class="text-gray-500">{{ $category->parent?->name ?? '-' }}</td>
@@ -92,7 +95,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center text-gray-500 py-8">
+                        <td colspan="7" class="text-center text-gray-500 py-8">
                             <svg class="w-12 h-12 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                             </svg>
@@ -111,36 +114,67 @@
         @endif
     </div>
 
+    <!-- Create Modal -->
+    <x-modal name="createModal" title="Tambah Kategori" maxWidth="md">
+        <form id="createForm" action="{{ route('categories.store') }}" method="POST">
+            @csrf
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Nama Kategori</label>
+                    <input type="text" name="name" id="createName" class="input" autocomplete="organization" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Kode</label>
+                    <input type="text" name="code" id="createCode" class="input" autocomplete="off" placeholder="Otomatis jika kosong">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Deskripsi</label>
+                    <textarea name="description" id="createDescription" class="input" rows="3" autocomplete="off"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Parent Kategori</label>
+                    <select name="parent_id" id="createParentId" class="input">
+                        <option value="">Tidak ada (Kategori Utama)</option>
+                        @foreach($parentCategories as $parent)
+                        <option value="{{ $parent->id }}">{{ $parent->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" name="is_active" id="createIsActive" value="1" class="rounded" checked>
+                    <label for="createIsActive" class="text-sm" style="color: var(--text-primary);">Aktif</label>
+                </div>
+            </div>
+            <div class="flex gap-2 mt-6">
+                <button type="button" onclick="closeModal('createModal')" class="btn btn-outline flex-1">Batal</button>
+                <button type="submit" class="btn btn-primary flex-1">Simpan</button>
+            </div>
+        </form>
+    </x-modal>
+
     <!-- Edit Modal -->
-    <div id="editModal-backdrop" class="modal-backdrop"></div>
-    <div id="editModal" class="modal-content w-full max-w-md rounded-xl p-6" style="background-color: var(--bg-card);">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold" style="color: var(--text-primary);">Edit Kategori</h3>
-            <button onclick="closeModal('editModal')" class="p-1 rounded hover:bg-gray-100">
-                <svg class="w-5 h-5" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
+    <x-modal name="editModal" title="Edit Kategori" maxWidth="md">
         <form id="editForm" method="POST">
             @csrf
             @method('PUT')
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Nama Kategori</label>
-                    <input type="text" name="name" id="editName" class="input" required>
+                    <input type="text" name="name" id="editName" class="input" autocomplete="organization" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Kode</label>
-                    <input type="text" name="code" id="editCode" class="input">
+                    <input type="text" name="code" id="editCode" class="input" autocomplete="off">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Deskripsi</label>
-                    <textarea name="description" id="editDescription" class="input" rows="3"></textarea>
+                    <textarea name="description" id="editDescription" class="input" rows="3" autocomplete="off"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Parent Kategori</label>
                     <select name="parent_id" id="editParentId" class="input">
                         <option value="">Tidak ada</option>
-                        @foreach($categories->where('parent_id', null) as $parent)
+                        @foreach($parentCategories as $parent)
                         <option value="{{ $parent->id }}">{{ $parent->name }}</option>
                         @endforeach
                     </select>
@@ -152,12 +186,18 @@
             </div>
             <div class="flex gap-2 mt-6">
                 <button type="button" onclick="closeModal('editModal')" class="btn btn-outline flex-1">Batal</button>
-                <button type="submit" class="btn btn-primary flex-1">Simpan</button>
+                <button type="submit" class="btn btn-primary flex-1">Update</button>
             </div>
         </form>
-    </div>
+    </x-modal>
 
     <script>
+        function openCreateModal() {
+            document.getElementById('createForm').reset();
+            document.getElementById('createIsActive').checked = true;
+            openModal('createModal');
+        }
+
         function openEditModal(category) {
             document.getElementById('editForm').action = `/master/categories/${category.id}`;
             document.getElementById('editName').value = category.name || '';

@@ -160,3 +160,44 @@ window.formatRupiah = (number) => {
 window.formatNumber = (number) => {
     return new Intl.NumberFormat('id-ID').format(number);
 };
+
+// Format Rupiah input (for form inputs)
+window.formatRupiahInput = (input, hiddenId) => {
+    let value = input.value.replace(/\D/g, '');
+    value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    input.value = value;
+    if (hiddenId) {
+        const hiddenField = document.getElementById(hiddenId);
+        if (hiddenField) {
+            hiddenField.value = value.replace(/\./g, '') || 0;
+        }
+    }
+};
+
+// Initialize Rupiah display from hidden value
+window.initRupiahDisplay = (displayId, hiddenId) => {
+    const hiddenVal = document.getElementById(hiddenId);
+    const displayVal = document.getElementById(displayId);
+    if (hiddenVal && displayVal && hiddenVal.value && parseInt(hiddenVal.value) > 0) {
+        displayVal.value = parseInt(hiddenVal.value).toLocaleString('id-ID');
+    }
+};
+
+// Global Image Viewer using SweetAlert2
+window.viewImage = (src, title = '') => {
+    Swal.fire({
+        imageUrl: src,
+        imageAlt: title,
+        title: title,
+        showConfirmButton: false,
+        showCloseButton: true,
+        width: 'auto',
+        padding: '1rem',
+        background: '#000',
+        customClass: {
+            title: 'text-white text-sm',
+            closeButton: 'text-white',
+            popup: 'rounded-xl'
+        }
+    });
+};

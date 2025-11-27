@@ -272,22 +272,28 @@ function uploadCroppedImage() {
         
         fetch('{{ route("profile.update") }}', {
             method: 'POST',
-            body: formData
-        }).then(response => {
-            if (response.ok) {
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil!',
-                    text: 'Foto profil berhasil diperbarui',
+                    text: data.message || 'Foto profil berhasil diperbarui',
                     timer: 1500,
                     showConfirmButton: false
                 }).then(() => window.location.reload());
             } else {
-                Swal.fire({ icon: 'error', title: 'Gagal!', text: 'Gagal mengupload foto.' });
+                Swal.fire({ icon: 'error', title: 'Gagal!', text: data.message || 'Gagal mengupload foto.' });
                 closeCropModal();
             }
-        }).catch(() => {
-            Swal.fire({ icon: 'error', title: 'Error!', text: 'Terjadi kesalahan jaringan.' });
+        }).catch(error => {
+            console.error('Upload error:', error);
+            Swal.fire({ icon: 'error', title: 'Error!', text: 'Terjadi kesalahan saat upload.' });
             closeCropModal();
         });
     }, 'image/jpeg', 0.9);

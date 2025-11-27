@@ -1,3 +1,4 @@
+@section('meta-description', 'Sistem transfer barang inventaris antar lokasi. Proses pengajuan, persetujuan, dan tracking perpindahan aset dengan workflow yang terstruktur.')
 <x-app-layout title="Transfer Barang">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
@@ -41,6 +42,7 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th class="w-12">No</th>
                         <th>No. Transfer</th>
                         <th>Barang</th>
                         <th>Dari</th>
@@ -52,19 +54,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($transfers as $transfer)
+                    @forelse($transfers as $index => $transfer)
                     <tr>
+                        <td class="text-gray-600">{{ $transfers->firstItem() + $index }}</td>
                         <td class="font-mono text-xs">{{ $transfer->transfer_number }}</td>
                         <td>
                             <a href="{{ route('commodities.show', $transfer->commodity) }}" class="text-primary-600 hover:underline">
                                 {{ Str::limit($transfer->commodity->name, 25) }}
                             </a>
                         </td>
-                        <td class="text-gray-500">{{ $transfer->fromLocation->name }}</td>
-                        <td class="text-gray-500">{{ $transfer->toLocation->name }}</td>
+                        <td class="text-gray-600">{{ $transfer->fromLocation->name }}</td>
+                        <td class="text-gray-600">{{ $transfer->toLocation->name }}</td>
                         <td>{{ $transfer->requester->name }}</td>
                         <td><span class="badge {{ $transfer->status_badge_class }}">{{ $transfer->status_label }}</span></td>
-                        <td class="text-gray-500">{{ $transfer->created_at->format('d M Y') }}</td>
+                        <td class="text-gray-600">{{ $transfer->created_at->format('d M Y') }}</td>
                         <td>
                             <div class="flex justify-end gap-2">
                                 <a href="{{ route('transfers.show', $transfer) }}" class="btn btn-sm btn-outline">Detail</a>
@@ -73,7 +76,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="text-center text-gray-500 py-8">Belum ada data transfer</td>
+                        <td colspan="9" class="text-center text-gray-600 py-8">Belum ada data transfer</td>
                     </tr>
                     @endforelse
                 </tbody>

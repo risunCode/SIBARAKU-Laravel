@@ -62,23 +62,34 @@ class LocationController extends Controller implements HasMiddleware
     /**
      * Simpan lokasi baru.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:20', 'unique:locations,code'],
+            'code' => ['nullable', 'string', 'max:20', 'unique:locations,code'],
             'description' => ['nullable', 'string'],
+            'address' => ['nullable', 'string'],
+            'pic' => ['nullable', 'string', 'max:255'],
             'building' => ['nullable', 'string', 'max:255'],
             'floor' => ['nullable', 'string', 'max:50'],
             'room' => ['nullable', 'string', 'max:50'],
             'is_active' => ['boolean'],
         ]);
 
+        // Auto generate code if empty
+        if (empty($validated['code'])) {
+            $validated['code'] = 'LOC' . strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $validated['name']), 0, 3)) . rand(100, 999);
+        }
+
         $validated['is_active'] = $request->boolean('is_active', true);
 
         $location = Location::create($validated);
 
         ActivityLog::log('created', "Membuat lokasi: {$location->name}", $location);
+
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => 'Lokasi berhasil ditambahkan.']);
+        }
 
         return redirect()->route('locations.index')
             ->with('success', 'Lokasi berhasil ditambahkan.');

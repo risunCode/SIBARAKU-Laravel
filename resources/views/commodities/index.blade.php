@@ -1,3 +1,4 @@
+@section('meta-description', 'Daftar lengkap barang inventaris dengan detail kategori, lokasi, kondisi, dan tracking perpindahan. Kelola aset perusahaan dengan mudah.')
 <x-app-layout title="Daftar Barang">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
@@ -81,6 +82,7 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th class="w-12">No</th>
                         <th>Kode</th>
                         <th>Nama Barang</th>
                         <th>Kategori</th>
@@ -91,14 +93,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($commodities as $commodity)
+                    @forelse($commodities as $index => $commodity)
                     <tr>
+                        <td class="text-gray-500">{{ $commodities->firstItem() + $index }}</td>
                         <td class="font-mono text-xs">{{ $commodity->item_code }}</td>
                         <td>
                             <div class="flex items-center gap-3">
                                 <img src="{{ $commodity->primary_image_url }}" 
-                                     class="w-10 h-10 rounded object-cover bg-gray-100" 
-                                     alt="{{ $commodity->name }}">
+                                     class="w-10 h-10 rounded object-cover bg-gray-100 cursor-pointer hover:opacity-80 transition" 
+                                     alt="{{ $commodity->name }}"
+                                     onclick="viewImage('{{ $commodity->primary_image_url }}', '{{ $commodity->name }}')">
                                 <div>
                                     <p class="font-medium text-gray-900">{{ Str::limit($commodity->name, 30) }}</p>
                                     @if($commodity->brand)
@@ -131,7 +135,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center text-gray-500 py-8">
+                        <td colspan="8" class="text-center text-gray-500 py-8">
                             <svg class="w-12 h-12 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                             </svg>
@@ -149,4 +153,5 @@
         </div>
         @endif
     </div>
+
 </x-app-layout>
