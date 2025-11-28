@@ -1,0 +1,38 @@
+GNU GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
+
+Copyright (C) 2024 SIBARANG - Sistem Inventaris Barang
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+---
+
+ADDITIONAL INFORMATION FOR ORGANIZATIONS:
+
+This license means you can:
+✅ Use SIBARANG for your organization (government, BUMN/BUMD, private companies)
+✅ Modify and customize the system for your specific needs
+✅ Distribute modified versions within your organization
+✅ Contribute improvements back to the project
+
+Requirements:
+⚠️ Keep the copyright notice and license information
+⚠️ Share your modifications under the same GPL-3.0 license
+⚠️ Provide access to the source code if you distribute the system
+
+For commercial deployment or custom development services,
+please contact the project maintainers or consider contributing
+to the open-source project.
+
+Full license text available at: https://www.gnu.org/licenses/gpl-3.0.html
