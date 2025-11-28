@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -44,21 +45,68 @@ class AuthenticatedSessionController extends Controller
             'password' => ['required'],
         ]);
 
+        // Sanitize email
+        $credentials['email'] = strtolower(trim($credentials['email']));
+
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
             // Cek apakah user aktif
             if (!Auth::user()->is_active) {
                 Auth::logout();
+                
+                // Log failed login (inactive account)
+                ActivityLog::create([
+                    'user_id' => Auth::id(),
+                    'action' => 'login_failed',
+                    'description' => 'Login gagal: Akun tidak aktif - ' . $credentials['email'],
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'created_at' => now(),
+                ]);
+                
                 return back()->withErrors([
                     'email' => 'Akun Anda telah dinonaktifkan. Hubungi administrator.',
                 ]);
             }
 
-            // Log aktivitas
+            // Log successful login
             ActivityLog::log('login', 'Login ke sistem');
 
+            // Check if user needs to setup security question
+            $user = Auth::user();
+            if (!$user->security_setup_completed) {
+                ActivityLog::log('security_setup_required', 'User redirected to security setup after login');
+                return redirect()->route('security.setup')
+                    ->with('warning', 'Anda harus mengatur pertanyaan keamanan sebelum dapat menggunakan sistem.');
+            }
+
             return redirect()->intended(route('dashboard'));
+        }
+
+        // Check if email exists but password is wrong
+        $user = User::where('email', $credentials['email'])->first();
+        
+        if ($user) {
+            // Log failed login (wrong password)
+            ActivityLog::create([
+                'user_id' => $user->id,
+                'action' => 'login_failed',
+                'description' => 'Login gagal: Password salah - ' . $credentials['email'],
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'created_at' => now(),
+            ]);
+        } else {
+            // Log failed login (email not found)
+            ActivityLog::create([
+                'user_id' => null,
+                'action' => 'login_failed',
+                'description' => 'Login gagal: Email tidak ditemukan - ' . $credentials['email'],
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'created_at' => now(),
+            ]);
         }
 
         return back()->withErrors([

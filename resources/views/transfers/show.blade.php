@@ -24,13 +24,27 @@
                 </div>
                 <div class="card-body">
                     <!-- Commodity -->
+                    @if($transfer->commodity)
                     <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg mb-4">
-                        <img src="{{ $transfer->commodity->primary_image_url }}" alt="" class="w-16 h-16 rounded-lg object-cover">
+                        <img src="{{ $transfer->commodity->primary_image_url ?? asset('images/no-image.png') }}" alt="" class="w-16 h-16 rounded-lg object-cover">
                         <div>
                             <a href="{{ route('commodities.show', $transfer->commodity) }}" class="font-medium text-primary-600 hover:underline">{{ $transfer->commodity->name }}</a>
                             <p class="text-sm text-gray-600">{{ $transfer->commodity->item_code }}</p>
                         </div>
                     </div>
+                    @else
+                    <div class="p-4 bg-red-50 rounded-lg mb-4 border border-red-200">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            <div>
+                                <p class="font-medium text-red-800">Barang Tidak Tersedia</p>
+                                <p class="text-sm text-red-600">Barang yang di-transfer sudah tidak ada atau telah dihapus dari sistem</p>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
 
                     <!-- From -> To -->
                     <div class="flex items-center justify-center gap-4 py-6 bg-gray-50 rounded-lg">

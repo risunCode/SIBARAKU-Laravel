@@ -58,7 +58,6 @@
                         <th>Nama</th>
                         <th>Parent</th>
                         <th>Jumlah Barang</th>
-                        <th>Status</th>
                         <th class="text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -70,13 +69,6 @@
                         <td class="font-medium">{{ $category->name }}</td>
                         <td class="text-gray-500">{{ $category->parent?->name ?? '-' }}</td>
                         <td>{{ $category->commodities_count }}</td>
-                        <td>
-                            @if($category->is_active)
-                                <span class="badge badge-success">Aktif</span>
-                            @else
-                                <span class="badge badge-gray">Nonaktif</span>
-                            @endif
-                        </td>
                         <td>
                             <div class="flex justify-end gap-1">
                                 @can('categories.edit')
@@ -95,7 +87,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center text-gray-500 py-8">
+                        <td colspan="6" class="text-center text-gray-500 py-8">
                             <svg class="w-12 h-12 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                             </svg>
@@ -136,13 +128,6 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="flex items-center pt-6">
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" name="is_active" id="createIsActive" value="1" class="sr-only peer" checked>
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
-                        <span class="ms-3 text-sm font-medium" style="color: var(--text-primary);">Status Aktif</span>
-                    </label>
-                </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Deskripsi</label>
                     <textarea name="description" id="createDescription" class="input w-full" rows="3" autocomplete="off" placeholder="Keterangan tentang kategori ini..."></textarea>
@@ -181,13 +166,6 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="flex items-center pt-6">
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" name="is_active" id="editIsActive" value="1" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
-                        <span class="ms-3 text-sm font-medium" style="color: var(--text-primary);">Status Aktif</span>
-                    </label>
-                </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Deskripsi</label>
                     <textarea name="description" id="editDescription" class="input w-full" rows="3" autocomplete="off" placeholder="Keterangan tentang kategori ini..."></textarea>
@@ -210,17 +188,15 @@
 
         function openCreateModal() {
             document.getElementById('createForm').reset();
-            document.getElementById('createIsActive').checked = true;
             openModal('createModal');
         }
 
         function openEditModal(category) {
-            document.getElementById('editForm').action = `/master/categories/${category.id}`;
+            document.getElementById('editForm').action = `/kategori/${category.id}`;
             document.getElementById('editName').value = category.name || '';
             document.getElementById('editCode').value = category.code || '';
             document.getElementById('editDescription').value = category.description || '';
             document.getElementById('editParentId').value = category.parent_id || '';
-            document.getElementById('editIsActive').checked = category.is_active;
             openModal('editModal');
         }
 
@@ -240,7 +216,7 @@
             if (!result.isConfirmed) return;
             
             try {
-                const response = await fetch(`/master/categories/${id}`, {
+                const response = await fetch(`/kategori/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',

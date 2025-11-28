@@ -59,7 +59,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($maintenanceLogs ?? [] as $maintenance)
+                            @forelse($logs ?? [] as $maintenance)
                             <tr class="border-b hover:opacity-80 transition-opacity" style="border-color: var(--border-color);">
                                 <td class="py-3 px-4 font-medium" style="color: var(--text-primary);">{{ $maintenance->commodity->name ?? '-' }}</td>
                                 <td class="py-3 px-4" style="color: var(--text-secondary);">{{ $maintenance->maintenance_type ?? 'Maintenance' }}</td>

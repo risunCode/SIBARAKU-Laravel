@@ -16,11 +16,9 @@
             </div>
         </div>
         <div class="flex items-center gap-2">
-            @foreach($user->roles as $role)
-            <span class="badge {{ $role->name === 'super-admin' ? 'badge-danger' : ($role->name === 'admin' ? 'badge-warning' : 'badge-info') }}">
-                {{ ucfirst($role->name) }}
+            <span class="badge {{ $user->role === 'admin' ? 'badge-warning' : ($user->role === 'staff' ? 'badge-info' : 'badge-gray') }}">
+                {{ ucfirst($user->role ?? 'User') }}
             </span>
-            @endforeach
             @if($user->is_active)
                 <span class="badge badge-success">Aktif</span>
             @else
@@ -77,23 +75,58 @@
             <!-- Recent Activity -->
             <div class="rounded-lg border overflow-hidden" style="background-color: var(--bg-card); border-color: var(--border-color);">
                 <div class="px-4 py-3 border-b" style="border-color: var(--border-color);">
-                    <h3 class="text-sm font-semibold" style="color: var(--text-primary);">Aktivitas Terakhir</h3>
+                    <h3 class="text-sm font-semibold flex items-center justify-between" style="color: var(--text-primary);">
+                        Aktivitas Terakhir
+                        <span class="text-xs font-normal px-2 py-1 rounded-full" style="background-color: var(--bg-input); color: var(--text-secondary);">{{ $activities->count() }} aktivitas</span>
+                    </h3>
                 </div>
-                <div class="divide-y max-h-64 overflow-y-auto" style="border-color: var(--border-color);">
-                    @forelse($activities as $activity)
-                    <div class="flex items-start gap-3 px-4 py-3">
-                        <span class="badge {{ $activity->action_badge_class }} shrink-0">{{ $activity->action_label }}</span>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm truncate" style="color: var(--text-primary);">{{ $activity->description }}</p>
-                            <p class="text-xs" style="color: var(--text-secondary);">{{ $activity->created_at->diffForHumans() }}</p>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="px-4 py-8 text-center" style="color: var(--text-secondary);">
-                        <p class="text-sm">Belum ada aktivitas</p>
-                    </div>
-                    @endforelse
+                @if($activities->count() > 0)
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead style="background-color: var(--bg-input);">
+                            <tr>
+                                <th class="px-4 py-2 text-left font-medium" style="color: var(--text-secondary);">Aksi</th>
+                                <th class="px-4 py-2 text-left font-medium" style="color: var(--text-secondary);">Deskripsi</th>
+                                <th class="px-4 py-2 text-left font-medium" style="color: var(--text-secondary);">IP Address</th>
+                                <th class="px-4 py-2 text-left font-medium" style="color: var(--text-secondary);">Waktu</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y" style="border-color: var(--border-color);">
+                            @foreach($activities->take(10) as $activity)
+                            <tr class="hover:bg-gray-50/50">
+                                <td class="px-4 py-3">
+                                    <span class="badge {{ $activity->action_badge_class }}">{{ $activity->action_label }}</span>
+                                </td>
+                                <td class="px-4 py-3" style="color: var(--text-primary);">
+                                    {{ $activity->description }}
+                                </td>
+                                <td class="px-4 py-3 text-xs font-mono" style="color: var(--text-secondary);">
+                                    {{ $activity->ip_address ?? '-' }}
+                                </td>
+                                <td class="px-4 py-3 text-xs" style="color: var(--text-secondary);">
+                                    <div class="flex flex-col">
+                                        <span>{{ $activity->created_at->format('d M Y, H:i') }}</span>
+                                        <span class="text-xs opacity-70">{{ $activity->created_at->diffForHumans() }}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
+                @if($activities->count() > 10)
+                <div class="px-4 py-3 border-t text-center" style="border-color: var(--border-color); background-color: var(--bg-input);">
+                    <p class="text-xs" style="color: var(--text-secondary);">Menampilkan 10 aktivitas terbaru dari {{ $activities->count() }} total</p>
+                </div>
+                @endif
+                @else
+                <div class="px-4 py-8 text-center" style="color: var(--text-secondary);">
+                    <svg class="w-12 h-12 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    <p class="text-sm">Belum ada aktivitas tercatat</p>
+                </div>
+                @endif
             </div>
         </div>
 
@@ -124,9 +157,22 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        const Toast = Swal.mixin({ toast: true, position: 'bottom-end', showConfirmButton: false, timer: 3000, timerProgressBar: true });
+        
         function copyToClipboard(text) {
-            navigator.clipboard.writeText(text);
+            navigator.clipboard.writeText(text).then(() => {
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Link referral berhasil disalin!'
+                });
+            }).catch(() => {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Gagal menyalin link'
+                });
+            });
         }
     </script>
 </x-app-layout>

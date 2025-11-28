@@ -16,7 +16,7 @@ class LocationController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:locations.view', only: ['index']),
+            new Middleware('permission:locations.view', only: ['index', 'show']),
             new Middleware('permission:locations.create', only: ['create', 'store']),
             new Middleware('permission:locations.edit', only: ['edit', 'update']),
             new Middleware('permission:locations.delete', only: ['destroy']),
@@ -45,7 +45,8 @@ class LocationController extends Controller implements HasMiddleware
             $query->where('building', $request->building);
         }
 
-        $locations = $query->orderBy('name')->paginate(15)->withQueryString();
+        $perPage = min($request->get('per_page', 15), 100); // Max 100 per page
+        $locations = $query->orderBy('name')->paginate($perPage)->withQueryString();
         $buildings = Location::distinct()->pluck('building')->filter();
 
         return view('locations.index', compact('locations', 'buildings'));
@@ -93,6 +94,15 @@ class LocationController extends Controller implements HasMiddleware
 
         return redirect()->route('locations.index')
             ->with('success', 'Lokasi berhasil ditambahkan.');
+    }
+
+    /**
+     * Tampilkan detail lokasi.
+     */
+    public function show(Location $location): View
+    {
+        $location->loadCount('commodities');
+        return view('locations.show', compact('location'));
     }
 
     /**

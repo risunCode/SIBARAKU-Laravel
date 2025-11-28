@@ -31,7 +31,7 @@
     <div class="card mb-6">
         <div class="card-body">
             <form action="{{ route('commodities.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <x-form.input 
+                <x-search-input 
                     name="search" 
                     placeholder="Cari kode/nama/merk..." 
                     :value="request('search')"
@@ -135,11 +135,14 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="text-center text-gray-500 py-8">
-                            <svg class="w-12 h-12 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                            </svg>
-                            <p>Belum ada data barang</p>
+                        <td colspan="8">
+                            <x-empty-state 
+                                icon="box"
+                                title="Belum ada barang"
+                                description="Mulai dengan menambahkan barang inventaris pertama Anda"
+                                action="{{ route('commodities.create') }}"
+                                actionText="Tambah Barang"
+                            />
                         </td>
                     </tr>
                     @endforelse
@@ -149,8 +152,25 @@
 
         @if($commodities->hasPages())
         <div class="card-footer">
-            <x-pagination :paginator="$commodities" />
+            <div class="flex items-center justify-between">
+                <p class="text-sm text-gray-600">
+                    Menampilkan <span class="font-medium">{{ $commodities->firstItem() }}</span> - 
+                    <span class="font-medium">{{ $commodities->lastItem() }}</span> 
+                    dari <span class="font-medium">{{ $commodities->total() }}</span> barang
+                </p>
+                <div>
+                    <x-pagination :paginator="$commodities" />
+                </div>
+            </div>
         </div>
+        @else
+        @if($commodities->count() > 0)
+        <div class="card-footer">
+            <p class="text-sm text-gray-600">
+                Menampilkan <span class="font-medium">{{ $commodities->count() }}</span> barang
+            </p>
+        </div>
+        @endif
         @endif
     </div>
 

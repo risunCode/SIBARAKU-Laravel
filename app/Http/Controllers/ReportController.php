@@ -6,7 +6,7 @@ use App\Models\Category;
 use App\Models\Commodity;
 use App\Models\Disposal;
 use App\Models\Location;
-use App\Models\MaintenanceLog;
+use App\Models\Maintenance;
 use App\Models\Transfer;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -228,7 +228,7 @@ class ReportController extends Controller implements HasMiddleware
      */
     public function maintenance(Request $request)
     {
-        $query = MaintenanceLog::with(['commodity', 'creator']);
+        $query = Maintenance::with(['commodity', 'creator']);
 
         if ($request->filled('from_date')) {
             $query->whereDate('maintenance_date', '>=', $request->from_date);
@@ -264,7 +264,7 @@ class ReportController extends Controller implements HasMiddleware
             'commodity_id' => ['required', 'exists:commodities,id'],
         ]);
 
-        $commodity = Commodity::with(['category', 'location', 'images', 'creator', 'maintenanceLogs'])
+        $commodity = Commodity::with(['category', 'location', 'images', 'creator', 'maintenances'])
             ->findOrFail($request->commodity_id);
 
         $pdf = Pdf::loadView('reports.pdf.kib', [

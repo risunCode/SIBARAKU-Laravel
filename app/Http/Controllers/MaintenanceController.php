@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
 use App\Models\Commodity;
-use App\Models\MaintenanceLog;
+use App\Models\Maintenance;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -29,7 +29,7 @@ class MaintenanceController extends Controller implements HasMiddleware
      */
     public function index(Request $request): View
     {
-        $query = MaintenanceLog::with(['commodity', 'creator']);
+        $query = Maintenance::with(['commodity', 'creator']);
 
         // Search
         if ($request->filled('search')) {
@@ -52,16 +52,17 @@ class MaintenanceController extends Controller implements HasMiddleware
             $query->upcoming();
         }
 
-        $maintenanceLogs = $query->latest()->paginate(15)->withQueryString();
+        $perPage = min($request->get('per_page', 15), 100); // Max 100 per page
+        $maintenances = $query->latest()->paginate($perPage)->withQueryString();
         
         // Data untuk modal
         $commodities = Commodity::orderBy('name')->get();
 
         // Stats
-        $overdueCount = MaintenanceLog::overdue()->count();
-        $upcomingCount = MaintenanceLog::upcoming()->count();
+        $overdueCount = Maintenance::overdue()->count();
+        $upcomingCount = Maintenance::upcoming()->count();
 
-        return view('maintenance.index', compact('maintenanceLogs', 'commodities', 'overdueCount', 'upcomingCount'));
+        return view('maintenance.index', compact('maintenances', 'commodities', 'overdueCount', 'upcomingCount'));
     }
 
     /**
@@ -95,14 +96,14 @@ class MaintenanceController extends Controller implements HasMiddleware
         $validated['created_by'] = Auth::id();
         $validated['cost'] = $validated['cost'] ?? 0;
 
-        $maintenanceLog = MaintenanceLog::create($validated);
+        $maintenanceLog = Maintenance::create($validated);
 
         // Update kondisi barang jika diisi
-        if (!empty($validated['condition_after'])) {
+        if (!empty($validated['condition_after']) && $maintenanceLog->commodity) {
             $maintenanceLog->commodity->update(['condition' => $validated['condition_after']]);
         }
 
-        ActivityLog::log('created', "Menambah log maintenance untuk barang: {$maintenanceLog->commodity->name}", $maintenanceLog);
+        ActivityLog::log('created', "Menambah log maintenance untuk barang: " . ($maintenanceLog->commodity->name ?? 'Barang tidak ditemukan'), $maintenanceLog);
 
         return redirect()->route('maintenance.show', $maintenanceLog)
             ->with('success', 'Log maintenance berhasil ditambahkan.');
@@ -111,7 +112,7 @@ class MaintenanceController extends Controller implements HasMiddleware
     /**
      * Tampilkan detail maintenance.
      */
-    public function show(MaintenanceLog $maintenance): View
+    public function show(Maintenance $maintenance): View
     {
         $maintenance->load(['commodity.images', 'creator']);
         return view('maintenance.show', compact('maintenance'));
@@ -120,7 +121,7 @@ class MaintenanceController extends Controller implements HasMiddleware
     /**
      * Tampilkan form edit maintenance.
      */
-    public function edit(MaintenanceLog $maintenance): View
+    public function edit(Maintenance $maintenance): View
     {
         $commodities = Commodity::orderBy('name')->get();
         return view('maintenance.edit', compact('maintenance', 'commodities'));
@@ -129,7 +130,7 @@ class MaintenanceController extends Controller implements HasMiddleware
     /**
      * Update maintenance.
      */
-    public function update(Request $request, MaintenanceLog $maintenance): RedirectResponse
+    public function update(Request $request, Maintenance $maintenance): RedirectResponse
     {
         $validated = $request->validate([
             'commodity_id' => ['required', 'exists:commodities,id'],
@@ -157,7 +158,7 @@ class MaintenanceController extends Controller implements HasMiddleware
     /**
      * Hapus maintenance.
      */
-    public function destroy(MaintenanceLog $maintenance): RedirectResponse
+    public function destroy(Maintenance $maintenance): RedirectResponse
     {
         $maintenance->delete();
 

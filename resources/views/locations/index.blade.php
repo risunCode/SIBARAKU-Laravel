@@ -48,7 +48,6 @@
                         <th>Gedung</th>
                         <th>Lantai/Ruang</th>
                         <th>Jumlah Barang</th>
-                        <th>Status</th>
                         <th class="text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -61,13 +60,6 @@
                         <td class="text-gray-500">{{ $location->building ?? '-' }}</td>
                         <td class="text-gray-500">{{ $location->floor }} {{ $location->room }}</td>
                         <td>{{ $location->commodities_count }}</td>
-                        <td>
-                            @if($location->is_active)
-                                <span class="badge badge-success">Aktif</span>
-                            @else
-                                <span class="badge badge-gray">Nonaktif</span>
-                            @endif
-                        </td>
                         <td>
                             <div class="flex justify-end gap-1">
                                 @can('locations.edit')
@@ -86,7 +78,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="text-center text-gray-500 py-8">Belum ada data lokasi</td>
+                        <td colspan="7" class="text-center text-gray-500 py-8">Belum ada data lokasi</td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -197,7 +189,7 @@
         }
 
         function openEditModal(location) {
-            document.getElementById('editForm').action = `/master/locations/${location.id}`;
+            document.getElementById('editForm').action = `/lokasi/${location.id}`;
             document.getElementById('editName').value = location.name || '';
             document.getElementById('editCode').value = location.code || '';
             document.getElementById('editDescription').value = location.description || '';
@@ -223,7 +215,7 @@
             if (!result.isConfirmed) return;
             
             try {
-                const response = await fetch(`/master/locations/${id}`, {
+                const response = await fetch(`/lokasi/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',

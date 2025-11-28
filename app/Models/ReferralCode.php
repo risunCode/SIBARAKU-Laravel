@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 class ReferralCode extends Model
@@ -16,6 +17,7 @@ class ReferralCode extends Model
         'used_count',
         'is_active',
         'expires_at',
+        'role',
     ];
 
     protected $casts = [
@@ -52,6 +54,15 @@ class ReferralCode extends Model
     }
 
     /**
+     * Users who used this referral code.
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\User::class, 'referral_code_usage')
+            ->withPivot('used_at');
+    }
+
+    /**
      * Check if code is valid for use.
      */
     public function isValid(): bool
@@ -64,7 +75,7 @@ class ReferralCode extends Model
             return false;
         }
 
-        if ($this->max_uses !== null && $this->used_count >= $this->max_uses) {
+        if ($this->max_uses !== null && $this->max_uses > 0 && $this->used_count >= $this->max_uses) {
             return false;
         }
 

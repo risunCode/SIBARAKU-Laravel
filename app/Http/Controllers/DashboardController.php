@@ -6,12 +6,21 @@ use App\Models\Category;
 use App\Models\Commodity;
 use App\Models\Disposal;
 use App\Models\Location;
-use App\Models\MaintenanceLog;
+use App\Models\Maintenance;
 use App\Models\Transfer;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class DashboardController extends Controller
+class DashboardController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:dashboard.view'),
+        ];
+    }
+
     /**
      * Tampilkan dashboard.
      */
@@ -40,13 +49,13 @@ class DashboardController extends Controller
         $pendingDisposals = Disposal::where('status', 'pending')->count();
 
         // Upcoming maintenance
-        $upcomingMaintenance = MaintenanceLog::whereNotNull('next_maintenance_date')
+        $upcomingMaintenance = Maintenance::whereNotNull('next_maintenance_date')
             ->where('next_maintenance_date', '>=', now())
             ->where('next_maintenance_date', '<=', now()->addDays(30))
             ->count();
 
         // Overdue maintenance
-        $overdueMaintenance = MaintenanceLog::whereNotNull('next_maintenance_date')
+        $overdueMaintenance = Maintenance::whereNotNull('next_maintenance_date')
             ->where('next_maintenance_date', '<', now())
             ->count();
 

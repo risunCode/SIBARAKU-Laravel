@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -26,6 +27,7 @@ class CommodityController extends Controller implements HasMiddleware
             new Middleware('permission:commodities.edit', only: ['edit', 'update']),
             new Middleware('permission:commodities.delete', only: ['destroy']),
             new Middleware('permission:commodities.export', only: ['export']),
+            new Middleware('permission:commodities.import', only: ['import']),
         ];
     }
 
@@ -67,7 +69,8 @@ class CommodityController extends Controller implements HasMiddleware
         $sortDirection = $request->get('direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
 
-        $commodities = $query->paginate(15)->withQueryString();
+        $perPage = min($request->get('per_page', 15), 100); // Max 100 per page
+        $commodities = $query->paginate($perPage)->withQueryString();
         $categories = Category::active()->orderBy('name')->get();
         $locations = Location::active()->orderBy('name')->get();
 
@@ -93,7 +96,12 @@ class CommodityController extends Controller implements HasMiddleware
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'category_id' => ['required', 'exists:categories,id'],
-            'location_id' => ['required', 'exists:locations,id'],
+            'location_id' => ['required', function($attribute, $value, $fail) {
+                if ($value !== 'custom' && !\App\Models\Location::where('id', $value)->exists()) {
+                    $fail('Lokasi yang dipilih tidak valid.');
+                }
+            }],
+            'custom_location' => ['required_if:location_id,custom', 'nullable', 'string', 'max:255'],
             'brand' => ['nullable', 'string', 'max:255'],
             'model' => ['nullable', 'string', 'max:255'],
             'serial_number' => ['nullable', 'string', 'max:255'],
@@ -112,25 +120,52 @@ class CommodityController extends Controller implements HasMiddleware
         $validated['created_by'] = Auth::id();
         $validated['purchase_price'] = $validated['purchase_price'] ?? 0;
 
-        $commodity = Commodity::create($validated);
-
-        // Handle images
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('commodities', 'public');
-                $commodity->images()->create([
-                    'image_path' => $path,
-                    'original_name' => $image->getClientOriginalName(),
-                    'is_primary' => $index === 0,
-                    'sort_order' => $index,
-                ]);
-            }
+        // Handle custom location
+        if ($validated['location_id'] === 'custom') {
+            // Create new location from custom input
+            $location = \App\Models\Location::create([
+                'name' => $validated['custom_location'],
+                'code' => 'LOC-' . strtoupper(\Illuminate\Support\Str::random(6)),
+                'building' => 'Manual Input',
+                'floor' => null,
+                'room' => null,
+            ]);
+            $validated['location_id'] = $location->id;
         }
+        
+        // Remove custom_location from validated data
+        unset($validated['custom_location']);
 
-        ActivityLog::log('created', "Menambah barang: {$commodity->name} ({$commodity->item_code})", $commodity);
+        try {
+            $commodity = Commodity::create($validated);
 
-        return redirect()->route('commodities.show', $commodity)
-            ->with('success', 'Barang berhasil ditambahkan.');
+            // Handle images
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $index => $image) {
+                    $path = $image->store('commodities', 'public');
+                    $commodity->images()->create([
+                        'image_path' => $path,
+                        'original_name' => $image->getClientOriginalName(),
+                        'is_primary' => $index === 0,
+                        'sort_order' => $index,
+                    ]);
+                }
+            }
+
+            ActivityLog::log('created', "Menambah barang: {$commodity->name} ({$commodity->item_code})", $commodity);
+
+            return redirect()->route('commodities.show', $commodity)
+                ->with('success', 'Barang berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            Log::error('Commodity creation failed', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'commodity_data' => $validated
+            ]);
+
+            return back()->with('error', 'Gagal menambahkan barang.')->withInput();
+        }
     }
 
     /**
@@ -146,7 +181,7 @@ class CommodityController extends Controller implements HasMiddleware
             'updater',
             'transfers.fromLocation',
             'transfers.toLocation',
-            'maintenanceLogs',
+            'maintenances',
             'disposals',
         ]);
 
@@ -173,7 +208,12 @@ class CommodityController extends Controller implements HasMiddleware
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'category_id' => ['required', 'exists:categories,id'],
-            'location_id' => ['required', 'exists:locations,id'],
+            'location_id' => ['required', function($attribute, $value, $fail) {
+                if ($value !== 'custom' && !\App\Models\Location::where('id', $value)->exists()) {
+                    $fail('Lokasi yang dipilih tidak valid.');
+                }
+            }],
+            'custom_location' => ['required_if:location_id,custom', 'nullable', 'string', 'max:255'],
             'brand' => ['nullable', 'string', 'max:255'],
             'model' => ['nullable', 'string', 'max:255'],
             'serial_number' => ['nullable', 'string', 'max:255'],
@@ -194,6 +234,22 @@ class CommodityController extends Controller implements HasMiddleware
 
         $validated['updated_by'] = Auth::id();
         $validated['purchase_price'] = $validated['purchase_price'] ?? 0;
+
+        // Handle custom location
+        if ($validated['location_id'] === 'custom') {
+            // Create new location from custom input
+            $location = \App\Models\Location::create([
+                'name' => $validated['custom_location'],
+                'code' => 'LOC-' . strtoupper(\Illuminate\Support\Str::random(6)),
+                'building' => 'Manual Input',
+                'floor' => null,
+                'room' => null,
+            ]);
+            $validated['location_id'] = $location->id;
+        }
+        
+        // Remove custom_location from validated data
+        unset($validated['custom_location']);
 
         $oldValues = $commodity->toArray();
 

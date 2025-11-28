@@ -15,27 +15,29 @@
             pointer-events: none;
             position: absolute;
         }
+        .auth-backdrop {
+            background-color: #1e40af;
+        }
     </style>
 </head>
-<body class="min-h-screen bg-gray-50" x-data="{ mode: '{{ $mode ?? 'login' }}', referralCode: '{{ $referralCode ?? '' }}' }">
+<body class="min-h-screen auth-backdrop" x-data="{ mode: '{{ $mode ?? 'login' }}', referralCode: '{{ $referralCode ?? '' }}' }">
     <div class="min-h-screen flex">
         <!-- Left Panel - Forms -->
-        <div class="w-full lg:w-1/2 flex flex-col">
+        <div class="w-full lg:w-1/2 flex flex-col bg-white/95 backdrop-blur-sm">
             <!-- Header -->
-            <div class="p-6 flex items-center justify-between">
+            <div class="p-6 flex items-center justify-between border-b border-gray-100">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                        </svg>
+                    <img src="{{ asset('images/logo-kab.png') }}" alt="Logo" class="h-10 w-auto">
+                    <div>
+                        <span class="font-bold text-gray-900 block">{{ config('app.name') }}</span>
+                        <span class="text-xs text-gray-500">Pemerintah Kabupaten Kubu Raya</span>
                     </div>
-                    <span class="font-semibold text-gray-900">{{ config('app.name') }}</span>
                 </div>
             </div>
 
             <!-- Form Container -->
             <div class="flex-1 flex items-center justify-center p-8">
-                <div class="w-full max-w-sm">
+                <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
 
                 <!-- Login Form -->
                 <div class="auth-panel" :class="mode !== 'login' && 'panel-hidden'" x-show="mode === 'login'">
@@ -59,7 +61,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                             <input type="email" name="email" value="{{ old('email') }}" required autofocus
-                                   class="form-input @error('email') border-danger-500 @enderror">
+                                   class="input w-full @error('email') border-danger-500 @enderror">
                             @error('email')
                             <p class="text-xs text-danger-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -68,7 +70,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                             <input type="password" name="password" required
-                                   class="form-input @error('password') border-danger-500 @enderror">
+                                   class="input w-full @error('password') border-danger-500 @enderror">
                             @error('password')
                             <p class="text-xs text-danger-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -126,7 +128,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Kode Referral</label>
                             <input type="text" x-model="referralCode" required
-                                   class="form-input uppercase tracking-wider text-center text-base font-mono"
+                                   class="input w-full uppercase tracking-wider text-center text-base font-mono"
                                    :class="error && 'border-danger-500'"
                                    maxlength="20" minlength="8"
                                    :disabled="checking">
@@ -164,7 +166,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
                             <input type="text" name="name" value="{{ old('name') }}" required
-                                   class="form-input @error('name') border-danger-500 @enderror">
+                                   class="input w-full @error('name') border-danger-500 @enderror">
                             @error('name')
                             <p class="text-xs text-danger-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -173,7 +175,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                             <input type="email" name="email" value="{{ old('email') }}" required
-                                   class="form-input @error('email') border-danger-500 @enderror">
+                                   class="input w-full @error('email') border-danger-500 @enderror">
                             @error('email')
                             <p class="text-xs text-danger-600 mt-1">{{ $message }}</p>
                             @enderror
@@ -183,11 +185,11 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                                 <input type="password" name="password" required
-                                       class="form-input @error('password') border-danger-500 @enderror">
+                                       class="input w-full @error('password') border-danger-500 @enderror">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi</label>
-                                <input type="password" name="password_confirmation" required class="form-input">
+                                <input type="password" name="password_confirmation" required class="input w-full">
                             </div>
                         </div>
                         @error('password')
@@ -207,39 +209,20 @@
             </div>
 
             <!-- Footer -->
-            <div class="p-6 text-center text-xs text-gray-400">
-                {{ config('app.name') }} &copy; {{ date('Y') }}
+            <div class="p-6 text-center text-xs text-gray-400 border-t border-gray-100">
+                &copy; {{ date('Y') }} Pemerintah Kabupaten Kubu Raya • {{ config('app.name') }}
             </div>
         </div>
 
         <!-- Right Panel - Branding -->
-        <div class="hidden lg:flex lg:w-1/2 bg-primary-600 items-center justify-center p-12 relative">
-            <div class="text-center max-w-md text-white">
-                <div class="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-8">
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                    </svg>
-                </div>
+        <div class="hidden lg:flex lg:w-1/2 items-center justify-center p-12">
+            <div class="text-center text-white">
+                <img src="{{ asset('images/logo-kab.png') }}" alt="Logo Kabupaten" class="h-28 w-auto mx-auto mb-6">
                 
-                <h2 class="text-2xl font-bold mb-3">Sistem Inventaris Barang</h2>
-                <p class="text-white/80 mb-10">
-                    Kelola aset dan inventaris dengan mudah, efisien, dan terintegrasi.
+                <h1 class="text-2xl font-bold mb-2">Sistem Inventaris Barang</h1>
+                <p class="text-white/80 text-sm">
+                    Pemerintah Kabupaten Kubu Raya
                 </p>
-
-                <div class="grid grid-cols-3 gap-4">
-                    <div class="bg-white/10 rounded-lg p-4">
-                        <div class="text-2xl font-bold">100%</div>
-                        <div class="text-white/70 text-xs">Digital</div>
-                    </div>
-                    <div class="bg-white/10 rounded-lg p-4">
-                        <div class="text-2xl font-bold">24/7</div>
-                        <div class="text-white/70 text-xs">Akses</div>
-                    </div>
-                    <div class="bg-white/10 rounded-lg p-4">
-                        <div class="text-2xl font-bold">Real</div>
-                        <div class="text-white/70 text-xs">Time</div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

@@ -49,9 +49,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($maintenanceLogs as $index => $log)
+                    @forelse($maintenances as $index => $log)
                     <tr>
-                        <td class="text-gray-500">{{ $maintenanceLogs->firstItem() + $index }}</td>
+                        <td class="text-gray-500">{{ $maintenances->firstItem() + $index }}</td>
                         <td>
                             <a href="{{ route('commodities.show', $log->commodity) }}" class="text-primary-600 hover:underline">
                                 {{ Str::limit($log->commodity->name, 25) }}
@@ -90,9 +90,9 @@
                 </tbody>
             </table>
         </div>
-        @if($maintenanceLogs->hasPages())
+        @if($maintenances->hasPages())
         <div class="card-footer">
-            <x-pagination :paginator="$maintenanceLogs" />
+            <x-pagination :paginator="$maintenances" />
         </div>
         @endif
     </div>

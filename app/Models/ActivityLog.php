@@ -106,9 +106,11 @@ class ActivityLog extends Model
             'restored' => 'Memulihkan',
             'login' => 'Login',
             'logout' => 'Logout',
+            'login_failed' => 'Login Gagal',
             'approved' => 'Menyetujui',
             'rejected' => 'Menolak',
             'transferred' => 'Transfer',
+            'register' => 'Registrasi',
             default => ucfirst($this->action),
         };
     }
@@ -125,8 +127,11 @@ class ActivityLog extends Model
             'restored' => 'badge-primary',
             'login' => 'badge-success',
             'logout' => 'badge-gray',
+            'login_failed' => 'badge-danger',
             'approved' => 'badge-success',
             'rejected' => 'badge-danger',
+            'register' => 'badge-success',
+            'transferred' => 'badge-primary',
             default => 'badge-gray',
         };
     }
@@ -148,7 +153,7 @@ class ActivityLog extends Model
             'Location' => 'Lokasi',
             'Transfer' => 'Transfer',
             'Disposal' => 'Penghapusan',
-            'MaintenanceLog' => 'Maintenance',
+            'Maintenance' => 'Maintenance',
             'User' => 'User',
             default => $className,
         };

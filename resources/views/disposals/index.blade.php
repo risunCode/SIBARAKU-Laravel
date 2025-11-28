@@ -57,9 +57,13 @@
                         <td class="text-gray-500">{{ $disposals->firstItem() + $index }}</td>
                         <td class="font-mono text-xs">{{ $disposal->disposal_number }}</td>
                         <td>
+                            @if($disposal->commodity)
                             <a href="{{ route('commodities.show', $disposal->commodity) }}" class="text-primary-600 hover:underline">
                                 {{ Str::limit($disposal->commodity->name, 25) }}
                             </a>
+                            @else
+                            <span class="text-gray-400">Barang tidak tersedia</span>
+                            @endif
                         </td>
                         <td>{{ $disposal->reason_label }}</td>
                         <td>{{ $disposal->formatted_value }}</td>

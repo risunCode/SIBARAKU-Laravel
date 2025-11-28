@@ -34,14 +34,36 @@
                                 </option>
                                 @endforeach
                             </x-form.select>
-                            <x-form.select label="Lokasi" name="location_id" required>
-                                <option value="">Pilih Lokasi</option>
-                                @foreach($locations as $location)
-                                <option value="{{ $location->id }}" {{ old('location_id') == $location->id ? 'selected' : '' }}>
-                                    {{ $location->name }}
-                                </option>
-                                @endforeach
-                            </x-form.select>
+                            <div>
+                                <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+                                    Lokasi <span class="text-red-500">*</span>
+                                </label>
+                                <div class="space-y-3">
+                                    <select name="location_id" id="locationSelect" class="input w-full" onchange="toggleCustomLocation()">
+                                        <option value="">Pilih dari daftar lokasi</option>
+                                        @foreach($locations as $location)
+                                        <option value="{{ $location->id }}" {{ old('location_id') == $location->id ? 'selected' : '' }}>
+                                            {{ $location->name }} - {{ $location->building ?? 'Gedung' }} {{ $location->floor ?? '' }} {{ $location->room ?? '' }}
+                                        </option>
+                                        @endforeach
+                                        <option value="custom" {{ old('location_id') == 'custom' ? 'selected' : '' }}>🏷️ Input Manual / Lainnya</option>
+                                    </select>
+                                    
+                                    <div id="customLocationInput" class="hidden">
+                                        <input type="text" name="custom_location" id="customLocation" 
+                                               placeholder="Contoh: Ruang Server Lt.3, Gudang Belakang, dll..." 
+                                               class="input w-full" 
+                                               value="{{ old('custom_location') }}">
+                                        <p class="text-xs mt-1" style="color: var(--text-secondary);">Masukkan lokasi sesuai kebutuhan</p>
+                                    </div>
+                                </div>
+                                @error('location_id')
+                                <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                                @enderror
+                                @error('custom_location')
+                                <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
                             <x-form.input label="Merk/Brand" name="brand" placeholder="Contoh: HP, Dell" />
@@ -146,6 +168,22 @@
             document.getElementById('purchase_price').value = numericValue || 0;
         }
 
+        // Toggle custom location input
+        function toggleCustomLocation() {
+            const select = document.getElementById('locationSelect');
+            const customInput = document.getElementById('customLocationInput');
+            const customField = document.getElementById('customLocation');
+            
+            if (select.value === 'custom') {
+                customInput.classList.remove('hidden');
+                customField.setAttribute('required', 'required');
+            } else {
+                customInput.classList.add('hidden');
+                customField.removeAttribute('required');
+                customField.value = '';
+            }
+        }
+
         // Initialize on page load if there's old value
         document.addEventListener('DOMContentLoaded', function() {
             const hiddenPrice = document.getElementById('purchase_price');
@@ -153,6 +191,9 @@
             if (hiddenPrice.value && hiddenPrice.value > 0) {
                 displayPrice.value = parseInt(hiddenPrice.value).toLocaleString('id-ID');
             }
+            
+            // Initialize custom location toggle
+            toggleCustomLocation();
         });
     </script>
     @endpush

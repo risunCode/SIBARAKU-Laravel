@@ -32,11 +32,36 @@
                                 <option value="{{ $category->id }}" {{ old('category_id', $commodity->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                 @endforeach
                             </x-form.select>
-                            <x-form.select label="Lokasi" name="location_id" :value="$commodity->location_id" required>
-                                @foreach($locations as $location)
-                                <option value="{{ $location->id }}" {{ old('location_id', $commodity->location_id) == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
-                                @endforeach
-                            </x-form.select>
+                            <div>
+                                <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+                                    Lokasi <span class="text-red-500">*</span>
+                                </label>
+                                <div class="space-y-3">
+                                    <select name="location_id" id="locationSelect" class="input w-full" onchange="toggleCustomLocation()">
+                                        <option value="">Pilih dari daftar lokasi</option>
+                                        @foreach($locations as $location)
+                                        <option value="{{ $location->id }}" {{ old('location_id', $commodity->location_id) == $location->id ? 'selected' : '' }}>
+                                            {{ $location->name }} - {{ $location->building ?? 'Gedung' }} {{ $location->floor ?? '' }} {{ $location->room ?? '' }}
+                                        </option>
+                                        @endforeach
+                                        <option value="custom" {{ old('location_id') == 'custom' ? 'selected' : '' }}>🏷️ Input Manual / Lainnya</option>
+                                    </select>
+                                    
+                                    <div id="customLocationInput" class="hidden">
+                                        <input type="text" name="custom_location" id="customLocation" 
+                                               placeholder="Contoh: Ruang Server Lt.3, Gudang Belakang, dll..." 
+                                               class="input w-full" 
+                                               value="{{ old('custom_location') }}">
+                                        <p class="text-xs mt-1" style="color: var(--text-secondary);">Masukkan lokasi sesuai kebutuhan</p>
+                                    </div>
+                                </div>
+                                @error('location_id')
+                                <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                                @enderror
+                                @error('custom_location')
+                                <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                             <x-form.input label="Merk/Brand" name="brand" :value="$commodity->brand" />
                             <x-form.input label="Model/Tipe" name="model" :value="$commodity->model" />
                             <x-form.input label="Serial Number" name="serial_number" :value="$commodity->serial_number" />
@@ -137,8 +162,27 @@
 
     @push('scripts')
     <script>
+        // Toggle custom location input
+        function toggleCustomLocation() {
+            const select = document.getElementById('locationSelect');
+            const customInput = document.getElementById('customLocationInput');
+            const customField = document.getElementById('customLocation');
+            
+            if (select.value === 'custom') {
+                customInput.classList.remove('hidden');
+                customField.setAttribute('required', 'required');
+            } else {
+                customInput.classList.add('hidden');
+                customField.removeAttribute('required');
+                customField.value = '';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             initRupiahDisplay('purchase_price_display', 'purchase_price');
+            
+            // Initialize custom location toggle
+            toggleCustomLocation();
         });
     </script>
     @endpush

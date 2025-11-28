@@ -23,14 +23,36 @@
                         @endforeach
                     </x-form.select>
 
-                    <x-form.select label="Lokasi Tujuan" name="to_location_id" required>
-                        <option value="">-- Pilih Lokasi Tujuan --</option>
-                        @foreach($locations as $location)
-                        <option value="{{ $location->id }}" {{ old('to_location_id') == $location->id ? 'selected' : '' }}>
-                            {{ $location->name }}
-                        </option>
-                        @endforeach
-                    </x-form.select>
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+                            Lokasi Tujuan <span class="text-red-500">*</span>
+                        </label>
+                        <div class="space-y-3">
+                            <select name="to_location_id" id="locationSelect" class="input w-full" onchange="toggleCustomLocation()">
+                                <option value="">-- Pilih Lokasi Tujuan --</option>
+                                @foreach($locations as $location)
+                                <option value="{{ $location->id }}" {{ old('to_location_id') == $location->id ? 'selected' : '' }}>
+                                    {{ $location->name }} - {{ $location->building ?? 'Gedung' }} {{ $location->floor ?? '' }} {{ $location->room ?? '' }}
+                                </option>
+                                @endforeach
+                                <option value="custom" {{ old('to_location_id') == 'custom' ? 'selected' : '' }}>🏷️ Input Manual / Lainnya</option>
+                            </select>
+                            
+                            <div id="customLocationInput" class="hidden">
+                                <input type="text" name="custom_location" id="customLocation" 
+                                       placeholder="Contoh: Ruang Server Lt.3, Gudang Belakang, dll..." 
+                                       class="input w-full" 
+                                       value="{{ old('custom_location') }}">
+                                <p class="text-xs mt-1" style="color: var(--text-secondary);">Masukkan lokasi tujuan transfer</p>
+                            </div>
+                        </div>
+                        @error('to_location_id')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                        @error('custom_location')
+                        <p class="text-xs text-red-600 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
                     <x-form.textarea label="Alasan Transfer" name="reason" required rows="3" placeholder="Jelaskan alasan perpindahan barang ini..." />
 
@@ -44,4 +66,27 @@
             </form>
         </div>
     </div>
+
+    <script>
+        // Toggle custom location input
+        function toggleCustomLocation() {
+            const select = document.getElementById('locationSelect');
+            const customInput = document.getElementById('customLocationInput');
+            const customField = document.getElementById('customLocation');
+            
+            if (select.value === 'custom') {
+                customInput.classList.remove('hidden');
+                customField.setAttribute('required', 'required');
+            } else {
+                customInput.classList.add('hidden');
+                customField.removeAttribute('required');
+                customField.value = '';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleCustomLocation();
+        });
+    </script>
 </x-app-layout>

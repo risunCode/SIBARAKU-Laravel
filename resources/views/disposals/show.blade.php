@@ -88,8 +88,9 @@
                     <h3 class="font-semibold text-gray-900">Barang yang Diajukan</h3>
                 </div>
                 <div class="card-body">
+                    @if($disposal->commodity)
                     <div class="flex items-center gap-4">
-                        <img src="{{ $disposal->commodity->primary_image_url }}" alt="" class="w-16 h-16 rounded-lg object-cover">
+                        <img src="{{ $disposal->commodity->primary_image_url ?? asset('images/no-image.png') }}" alt="" class="w-16 h-16 rounded-lg object-cover">
                         <div>
                             <a href="{{ route('commodities.show', $disposal->commodity) }}" class="font-semibold text-primary-600 hover:underline">
                                 {{ $disposal->commodity->name }}
@@ -99,8 +100,13 @@
                         </div>
                     </div>
                     <div class="mt-3 pt-3 border-t text-sm text-gray-500">
-                        <p>Lokasi: {{ $disposal->commodity->location->name }}</p>
+                        <p>Lokasi: {{ $disposal->commodity->location->name ?? 'Tidak diketahui' }}</p>
                     </div>
+                    @else
+                    <div class="text-center text-gray-500 py-4">
+                        <p>Barang tidak tersedia atau telah dihapus</p>
+                    </div>
+                    @endif
                 </div>
             </div>
 

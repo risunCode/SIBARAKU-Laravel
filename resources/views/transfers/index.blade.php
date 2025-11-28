@@ -59,9 +59,13 @@
                         <td class="text-gray-600">{{ $transfers->firstItem() + $index }}</td>
                         <td class="font-mono text-xs">{{ $transfer->transfer_number }}</td>
                         <td>
+                            @if($transfer->commodity)
                             <a href="{{ route('commodities.show', $transfer->commodity) }}" class="text-primary-600 hover:underline">
                                 {{ Str::limit($transfer->commodity->name, 25) }}
                             </a>
+                            @else
+                            <span class="text-gray-400">Barang tidak tersedia</span>
+                            @endif
                         </td>
                         <td class="text-gray-600">{{ $transfer->fromLocation->name }}</td>
                         <td class="text-gray-600">{{ $transfer->toLocation->name }}</td>

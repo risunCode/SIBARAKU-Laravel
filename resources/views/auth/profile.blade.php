@@ -13,7 +13,7 @@
                              class="w-24 h-24 rounded-full object-cover mx-auto mb-4 ring-4" style="--tw-ring-color: var(--border-color);">
                         <h3 class="text-xl font-semibold" style="color: var(--text-primary);">{{ $user->name }}</h3>
                         <p class="text-sm" style="color: var(--text-secondary);">{{ $user->email }}</p>
-                        <span class="inline-block mt-2 px-3 py-1 text-xs rounded-full btn-primary">{{ $user->roles->first()?->name ?? 'User' }}</span>
+                        <span class="inline-block mt-2 px-3 py-1 text-xs rounded-full btn-primary">{{ ucfirst($user->role ?? 'User') }}</span>
                     </div>
                     
                     <!-- Photo Upload with Crop -->
@@ -37,7 +37,12 @@
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-sm" style="color: var(--text-secondary);">Terakhir Login</span>
-                            <span class="text-sm font-medium" style="color: var(--text-primary);">{{ $user->last_login_at?->diffForHumans() ?? '-' }}</span>
+                            <div class="text-right">
+                                <span class="text-sm font-medium block" style="color: var(--text-primary);">{{ $user->last_login_at?->format('d M Y') ?? '-' }}</span>
+                                @if($user->last_login_at)
+                                    <span class="text-xs" style="color: var(--text-secondary);">{{ $user->last_login_at->format('H:i') }} WIB ({{ $user->last_login_at->diffForHumans() }})</span>
+                                @endif
+                            </div>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-sm" style="color: var(--text-secondary);">Status</span>
@@ -53,22 +58,33 @@
             <div class="lg:col-span-2 space-y-6">
                 <!-- Profile Info -->
                 <div class="rounded-xl border p-6" style="background-color: var(--bg-card); border-color: var(--border-color);">
-                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2" style="color: var(--text-primary);">
-                        <svg class="w-5 h-5" style="color: var(--accent-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        Informasi Profil
-                    </h3>
-                    <form action="{{ route('profile.update') }}" method="POST">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold flex items-center gap-2" style="color: var(--text-primary);">
+                            <svg class="w-5 h-5" style="color: var(--accent-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            Informasi Profil
+                        </h3>
+                        <button type="button" id="editProfileBtn" onclick="toggleProfileEdit()" class="btn btn-outline btn-sm">
+                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            Edit
+                        </button>
+                    </div>
+                    <form id="profileForm" action="{{ route('profile.update') }}" method="POST">
                         @csrf @method('PATCH')
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <x-form.input label="Nama Lengkap" name="name" :value="$user->name" required />
-                            <x-form.input label="Email" name="email" type="email" :value="$user->email" required />
-                            <x-form.input label="No. Telepon" name="phone" :value="$user->phone" placeholder="08xxxxxxxxxx" />
-                            <x-form.input label="Tanggal Lahir" name="birth_date" type="date" :value="$user->birth_date?->format('Y-m-d')" />
+                            <x-form.input label="Nama Lengkap" name="name" :value="$user->name" required disabled id="input-name" />
+                            <x-form.input label="Email" name="email" type="email" :value="$user->email" required disabled id="input-email" />
+                            <x-form.input label="No. Telepon" name="phone" :value="$user->phone" placeholder="08xxxxxxxxxx" disabled id="input-phone" />
+                            <x-form.input label="Tanggal Lahir" name="birth_date" type="date" :value="$user->birth_date?->format('Y-m-d')" disabled id="input-birth_date" />
                         </div>
-                        <button type="submit" class="btn btn-primary">
-                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            Simpan Profil
-                        </button>
+                        <div id="profileFormButtons" class="hidden flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                Simpan Profil
+                            </button>
+                            <button type="button" onclick="cancelProfileEdit()" class="btn btn-outline">
+                                Batal
+                            </button>
+                        </div>
                     </form>
                 </div>
 
@@ -117,9 +133,15 @@
                                         </span>
                                     @endif
                                 </p>
-                                <p class="text-xs mt-1" style="color: var(--text-secondary);">Verifikasi tanggal lahir untuk mengubah pertanyaan keamanan</p>
+                                @if(!$user->birth_date)
+                                    <p class="text-xs mt-1 text-red-600">⚠️ Isi tanggal lahir di bagian profil terlebih dahulu</p>
+                                @else
+                                    <p class="text-xs mt-1" style="color: var(--text-secondary);">Verifikasi tanggal lahir untuk mengubah pertanyaan keamanan</p>
+                                @endif
                             </div>
-                            <button type="button" onclick="openVerifyBirthModal()" class="btn btn-primary text-sm">
+                            <button type="button" onclick="openVerifyBirthModal()" 
+                                    class="btn {{ $user->birth_date ? 'btn-primary' : 'btn-secondary cursor-not-allowed opacity-50' }} text-sm"
+                                    {{ !$user->birth_date ? 'disabled' : '' }}>
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                 Ubah
                             </button>
@@ -234,51 +256,49 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 let cropper = null;
+let formChanged = false;
 const userBirthDate = '{{ $user->birth_date?->format("Y-m-d") ?? "" }}';
-const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true });
+const Toast = Swal.mixin({ 
+    toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 
+});
 
-// Show session messages
-@if(session()->has('success') && session('success'))
-Toast.fire({ icon: 'success', title: '{{ session("success") }}' });
-@endif
-@if(session()->has('error') && session('error'))
-Toast.fire({ icon: 'error', title: '{{ session("error") }}' });
-@endif
-
-// Verify Birth Date Modal
-function openVerifyBirthModal() {
-    if (!userBirthDate) {
-        alert('Silakan atur tanggal lahir Anda terlebih dahulu di bagian Informasi Profil.');
-        return;
-    }
-    document.getElementById('verify-birth-date').value = '';
-    document.getElementById('verify-error').classList.add('hidden');
-    openModal('verifyBirthModal');
-}
-
-function verifyBirthDate() {
-    const inputDate = document.getElementById('verify-birth-date').value;
-    const errorEl = document.getElementById('verify-error');
+// Profile edit toggle
+function toggleProfileEdit() {
+    const inputs = ['input-name', 'input-email', 'input-phone', 'input-birth_date'];
+    const editBtn = document.getElementById('editProfileBtn');
+    const buttonsDiv = document.getElementById('profileFormButtons');
     
-    if (inputDate === userBirthDate) {
-        closeModal('verifyBirthModal');
-        openModal('securityModal');
+    inputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) input.disabled = !input.disabled;
+    });
+    
+    if (buttonsDiv.classList.contains('hidden')) {
+        buttonsDiv.classList.remove('hidden');
+        editBtn.innerHTML = '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>Batal';
     } else {
-        errorEl.classList.remove('hidden');
+        cancelProfileEdit();
     }
 }
 
-// Toggle custom question
-function toggleCustomQuestion() {
-    const select = document.getElementById('securityQuestion');
-    const wrapper = document.getElementById('customQuestionWrapper');
-    if (select.value === '0') {
-        wrapper.classList.remove('hidden');
-    } else {
-        wrapper.classList.add('hidden');
-    }
+function cancelProfileEdit() {
+    const inputs = ['input-name', 'input-email', 'input-phone', 'input-birth_date'];
+    const editBtn = document.getElementById('editProfileBtn');
+    const buttonsDiv = document.getElementById('profileFormButtons');
+    
+    inputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) input.disabled = true;
+    });
+    
+    buttonsDiv.classList.add('hidden');
+    editBtn.innerHTML = '<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>Edit';
+    
+    // Reset form to original values
+    document.getElementById('profileForm').reset();
 }
 
+// Crop functionality
 function openCropModal(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -344,38 +364,98 @@ function uploadCroppedImage() {
         width: 256,
         height: 256,
         imageSmoothingEnabled: true,
-        imageSmoothingQuality: 'high',
+        imageSmoothingQuality: 'high'
     }).toBlob(function(blob) {
         const formData = new FormData();
-        formData.append('avatar', blob, 'profile.jpg');
+        formData.append('avatar', blob, 'avatar.jpg');
         formData.append('_token', '{{ csrf_token() }}');
         formData.append('_method', 'PATCH');
         
         fetch('{{ route("profile.update") }}', {
             method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            }
-        }).then(response => response.json())
+            body: formData
+        })
+        .then(response => response.json())
         .then(data => {
             if (data.success) {
-                window.location.reload();
-            } else {
-                alert('Gagal: ' + (data.message || 'Gagal mengupload foto.'));
+                document.getElementById('profile-preview').src = data.avatar_url + '?t=' + Date.now();
                 closeCropModal();
+                Toast.fire({ icon: 'success', title: 'Foto profil berhasil diperbarui!' });
+            } else {
+                alert(data.message || 'Gagal memperbarui foto profil');
             }
-        }).catch(error => {
-            console.error('Upload error:', error);
-            alert('Error: Terjadi kesalahan saat upload.');
-            closeCropModal();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan saat memperbarui foto profil');
         });
     }, 'image/jpeg', 0.9);
 }
+
+function openVerifyBirthModal() {
+    if (!userBirthDate) {
+        alert('Tanggal lahir belum diatur. Silakan isi tanggal lahir di bagian informasi profil terlebih dahulu.');
+        return;
+    }
+    openModal('verifyBirthModal');
+}
+
+function verifyBirthDate() {
+    const inputDate = document.getElementById('verify-birth-date').value;
+    if (inputDate === userBirthDate) {
+        closeModal('verifyBirthModal');
+        openModal('securityModal');
+        document.getElementById('verify-error').classList.add('hidden');
+    } else {
+        document.getElementById('verify-error').classList.remove('hidden');
+    }
+}
+
+function toggleCustomQuestion() {
+    const select = document.getElementById('securityQuestion');
+    const wrapper = document.getElementById('customQuestionWrapper');
+    if (select.value === '0') {
+        wrapper.classList.remove('hidden');
+    } else {
+        wrapper.classList.add('hidden');
+    }
+}
+
+// Show session messages
+@if(session()->has('success'))
+Toast.fire({ icon: 'success', title: '{{ session("success") }}' });
+@endif
+@if(session()->has('error'))
+Toast.fire({ icon: 'error', title: '{{ session("error") }}' });
+@endif
 </script>
 <style>
 .cropper-view-box, .cropper-face { border-radius: 50%; }
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.modal-backdrop.active {
+    opacity: 1;
+}
+.modal-content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    z-index: 1001;
+    transition: transform 0.2s ease;
+}
+.modal-content.active {
+    transform: translate(-50%, -50%) scale(1);
+}
 </style>
 @endpush
-</x-app-layout>
+    </x-app-layout>

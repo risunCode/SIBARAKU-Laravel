@@ -279,7 +279,7 @@
                             <img src="{{ auth()->user()->avatar_url }}" class="w-8 h-8 rounded-full object-cover" alt="">
                             <div class="hidden sm:block text-left">
                                 <p class="text-sm font-medium" style="color: var(--text-primary);">{{ auth()->user()->name }}</p>
-                                <p class="text-xs" style="color: var(--text-secondary);">{{ auth()->user()->roles->first()?->name ?? 'User' }}</p>
+                                <p class="text-xs" style="color: var(--text-secondary);">{{ ucfirst(auth()->user()->role ?? 'User') }}</p>
                             </div>
                             <svg class="w-4 h-4" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -413,18 +413,30 @@
     </style>
 
     <script>
-        // Modal Functions
+        // Modal state for accessibility
+        let previousActiveElement = null;
+        
+        // Modal Functions with accessibility
         function openModal(modalId) {
+            previousActiveElement = document.activeElement;
             const modal = document.getElementById(modalId);
             const backdrop = document.getElementById(modalId + '-backdrop');
             if (modal && backdrop) {
                 backdrop.style.display = 'block';
                 modal.style.display = 'block';
+                // ARIA attributes
+                backdrop.setAttribute('aria-hidden', 'false');
+                modal.setAttribute('aria-hidden', 'false');
                 // Trigger reflow for animation
                 void modal.offsetWidth;
                 backdrop.classList.add('active');
                 modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
+                // Focus first focusable element
+                setTimeout(() => {
+                    const firstInput = modal.querySelector('input, select, textarea, button');
+                    if (firstInput) firstInput.focus();
+                }, 100);
             }
         }
 
@@ -435,11 +447,19 @@
                 backdrop.classList.remove('active');
                 modal.classList.remove('active');
                 document.body.style.overflow = '';
+                // ARIA attributes
+                backdrop.setAttribute('aria-hidden', 'true');
+                modal.setAttribute('aria-hidden', 'true');
                 // Hide after animation
                 setTimeout(() => {
                     backdrop.style.display = 'none';
                     modal.style.display = 'none';
                 }, 200);
+                // Return focus
+                if (previousActiveElement) {
+                    previousActiveElement.focus();
+                    previousActiveElement = null;
+                }
             }
         }
 
@@ -823,6 +843,54 @@
             showValidationError(errorMessage);
         });
         @endif
+
+        // Skip links for screen readers
+        document.addEventListener('DOMContentLoaded', function() {
+            const skipLink = document.createElement('a');
+            skipLink.href = '#main-content';
+            skipLink.textContent = 'Skip to main content';
+            skipLink.className = 'sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-600 focus:text-white focus:rounded';
+            document.body.insertBefore(skipLink, document.body.firstChild);
+            
+            const mainContent = document.querySelector('main') || document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.id = 'main-content';
+                mainContent.setAttribute('role', 'main');
+            }
+        });
+        
+        // Global Unsaved Changes Warning
+        let formChanged = false;
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track all form inputs globally
+            const allForms = document.querySelectorAll('form:not([data-no-warn])');
+            allForms.forEach(form => {
+                const inputs = form.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    // Skip hidden, submit, and button inputs
+                    if (input.type === 'hidden' || input.type === 'submit' || input.type === 'button') return;
+                    input.addEventListener('change', () => { formChanged = true; });
+                    input.addEventListener('input', () => { formChanged = true; });
+                });
+                
+                // Reset flag on form submit
+                form.addEventListener('submit', () => { formChanged = false; });
+            });
+            
+            // Also reset on modal close (to avoid false positives)
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                backdrop.addEventListener('click', () => { formChanged = false; });
+            });
+        });
+        
+        // Warn before leaving if changes exist
+        window.addEventListener('beforeunload', function(e) {
+            if (formChanged) {
+                e.preventDefault();
+                e.returnValue = 'Ada perubahan yang belum disimpan. Yakin ingin meninggalkan halaman?';
+                return e.returnValue;
+            }
+        });
     </script>
 
     @stack('scripts')

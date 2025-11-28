@@ -137,9 +137,9 @@ class Commodity extends Model
     /**
      * Riwayat maintenance.
      */
-    public function maintenanceLogs(): HasMany
+    public function maintenances(): HasMany
     {
-        return $this->hasMany(MaintenanceLog::class);
+        return $this->hasMany(Maintenance::class);
     }
 
     /**

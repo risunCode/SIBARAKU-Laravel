@@ -26,7 +26,7 @@
                         <x-form.input label="Konfirmasi Password" name="password_confirmation" type="password" required />
                     </div>
 
-                    <x-form.select label="Role" name="role" required :options="$roles->pluck('name', 'name')->map(fn($v) => ucfirst($v))->toArray()" />
+                    <x-form.select label="Role" name="role" required :options="$roles" />
 
                     <div>
                         <label class="form-label">Avatar</label>

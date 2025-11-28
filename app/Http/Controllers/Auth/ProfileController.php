@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -37,47 +38,81 @@ class ProfileController extends Controller
 
         if ($isAvatarOnly) {
             $request->validate([
-                'avatar' => ['required', 'image', 'max:2048'],
+                'avatar' => ['required', 'image', 'mimes:jpeg,png,gif,webp', 'max:2048'],
             ]);
 
-            // Hapus avatar lama
-            if ($user->avatar) {
-                Storage::disk('public')->delete($user->avatar);
+            try {
+                // Hapus avatar lama
+                if ($user->avatar) {
+                    Storage::disk('public')->delete($user->avatar);
+                }
+
+                $avatarPath = $request->file('avatar')->store('avatars', 'public');
+                $user->update(['avatar' => $avatarPath]);
+
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json([
+                        'success' => true, 
+                        'message' => 'Foto profil berhasil diperbarui.',
+                        'avatar_url' => $user->avatar_url
+                    ]);
+                }
+
+                return back()->with('success', 'Foto profil berhasil diperbarui.');
+            } catch (\Exception $e) {
+                Log::error('Avatar upload failed', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]);
+
+                if ($request->expectsJson() || $request->ajax()) {
+                    return response()->json(['success' => false, 'message' => 'Gagal mengupload foto profil.'], 500);
+                }
+
+                return back()->with('error', 'Gagal mengupload foto profil.');
             }
-
-            $user->update([
-                'avatar' => $request->file('avatar')->store('avatars', 'public')
-            ]);
-
-            if ($request->expectsJson() || $request->ajax()) {
-                return response()->json(['success' => true, 'message' => 'Foto profil berhasil diperbarui.']);
-            }
-
-            return back()->with('success', 'Foto profil berhasil diperbarui.');
         }
 
         // Normal profile update
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'string', 'regex:/^(\+62|0)[0-9]{9,12}$/', 'max:20'],
             'birth_date' => ['nullable', 'date'],
-            'avatar' => ['nullable', 'image', 'max:2048'],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,gif,webp', 'max:2048'],
         ]);
 
-        // Handle avatar upload
-        if ($request->hasFile('avatar')) {
-            // Hapus avatar lama
-            if ($user->avatar) {
-                Storage::disk('public')->delete($user->avatar);
+        // Sanitize input data
+        $validated['name'] = trim($validated['name']);
+        $validated['email'] = strtolower(trim($validated['email']));
+        $validated['phone'] = $validated['phone'] ? trim($validated['phone']) : null;
+
+        try {
+            // Handle avatar upload
+            if ($request->hasFile('avatar')) {
+                // Hapus avatar lama
+                if ($user->avatar) {
+                    Storage::disk('public')->delete($user->avatar);
+                }
+
+                $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
             }
 
-            $validated['avatar'] = $request->file('avatar')->store('avatars', 'public');
+            $user->update($validated);
+
+            return back()->with('success', 'Profil berhasil diperbarui.');
+        } catch (\Exception $e) {
+            Log::error('Profile update failed', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return back()->with('error', 'Gagal memperbarui profil.');
         }
-
-        $user->update($validated);
-
-        return back()->with('success', 'Profil berhasil diperbarui.');
     }
 
     /**

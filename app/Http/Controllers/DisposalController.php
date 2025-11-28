@@ -20,6 +20,7 @@ class DisposalController extends Controller implements HasMiddleware
             new Middleware('permission:disposals.view', only: ['index', 'show']),
             new Middleware('permission:disposals.create', only: ['create', 'store']),
             new Middleware('permission:disposals.approve', only: ['approve', 'reject']),
+            new Middleware('permission:disposals.delete', only: ['destroy']),
         ];
     }
 
@@ -44,7 +45,8 @@ class DisposalController extends Controller implements HasMiddleware
             });
         }
 
-        $disposals = $query->latest()->paginate(15)->withQueryString();
+        $perPage = min($request->get('per_page', 15), 100); // Max 100 per page
+        $disposals = $query->latest()->paginate($perPage)->withQueryString();
         
         // Data untuk modal
         $commodities = Commodity::orderBy('name')->get();
@@ -115,6 +117,11 @@ class DisposalController extends Controller implements HasMiddleware
             return back()->with('error', 'Pengajuan tidak bisa disetujui.');
         }
 
+        // Check if commodity still exists
+        if (!$disposal->commodity) {
+            return back()->with('error', 'Tidak dapat menyetujui penghapusan. Barang sudah tidak ada dalam sistem.');
+        }
+
         $disposal->update([
             'status' => 'approved',
             'approved_by' => Auth::id(),
@@ -162,7 +169,7 @@ class DisposalController extends Controller implements HasMiddleware
             return back()->with('error', 'Hanya pengajuan dengan status pending yang bisa dibatalkan.');
         }
 
-        if ($disposal->requested_by !== Auth::id() && !Auth::user()->hasRole('admin')) {
+        if ($disposal->requested_by !== Auth::id() && Auth::user()->role !== 'admin') {
             return back()->with('error', 'Anda tidak memiliki izin untuk membatalkan pengajuan ini.');
         }
 

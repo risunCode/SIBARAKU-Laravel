@@ -13,7 +13,7 @@ class ReferralCodeController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:users.manage'),
+            new Middleware('permission:referral-codes.manage'),
         ];
     }
 
@@ -46,7 +46,8 @@ class ReferralCodeController extends Controller implements HasMiddleware
             }
         }
 
-        $referralCodes = $query->paginate($request->get('per_page', 10));
+        $perPage = min($request->get('per_page', 10), 100); // Max 100 per page
+        $referralCodes = $query->paginate($perPage);
 
         $stats = [
             'total' => ReferralCode::count(),
@@ -70,7 +71,8 @@ class ReferralCodeController extends Controller implements HasMiddleware
             'code' => 'nullable|string|max:20|unique:referral_codes,code',
             'description' => 'nullable|string|max:255',
             'max_uses' => 'nullable|integer|min:1',
-            'expires_at' => 'nullable|date|after:now',
+            'expires_at' => 'nullable|date|after:now|before:+5 years',
+            'role' => 'nullable|string|in:admin,staff,user',
         ]);
 
         $referralCode = ReferralCode::create([
@@ -78,6 +80,7 @@ class ReferralCodeController extends Controller implements HasMiddleware
             'description' => $validated['description'] ?? null,
             'max_uses' => $validated['max_uses'] ?? null,
             'expires_at' => $validated['expires_at'] ?? null,
+            'role' => $validated['role'] ?? 'user',
             'created_by' => auth()->id(),
         ]);
 
@@ -96,7 +99,8 @@ class ReferralCodeController extends Controller implements HasMiddleware
         $validated = $request->validate([
             'description' => 'nullable|string|max:255',
             'max_uses' => 'nullable|integer|min:1',
-            'expires_at' => 'nullable|date',
+            'expires_at' => 'nullable|date|after:now|before:+5 years',
+            'role' => 'nullable|string|in:admin,staff,user',
             'is_active' => 'boolean',
         ]);
 

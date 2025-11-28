@@ -41,10 +41,10 @@
                         <x-form.input label="Konfirmasi Password" name="password_confirmation" type="password" />
                     </div>
 
-                    <x-form.select label="Role" name="role" :value="$user->roles->first()?->name" required>
-                        @foreach($roles as $role)
-                        <option value="{{ $role->name }}" {{ $user->roles->first()?->name == $role->name ? 'selected' : '' }}>
-                            {{ ucfirst($role->name) }}
+                    <x-form.select label="Role" name="role" :value="$user->role" required>
+                        @foreach($roles as $value => $label)
+                        <option value="{{ $value }}" {{ $user->role == $value ? 'selected' : '' }}>
+                            {{ $label }}
                         </option>
                         @endforeach
                     </x-form.select>

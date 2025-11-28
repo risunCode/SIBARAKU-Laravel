@@ -15,7 +15,7 @@
     <label for="{{ $name }}" class="form-label">
         {{ $label }}
         @if($required)
-        <span class="text-danger-500">*</span>
+        <span class="text-danger-500" aria-label="wajib diisi">*</span>
         @endif
     </label>
     @endif
@@ -26,17 +26,18 @@
         id="{{ $name }}"
         value="{{ old($name, $value) }}"
         placeholder="{{ $placeholder }}"
-        {{ $required ? 'required' : '' }}
+        {{ $required ? 'required aria-required="true"' : '' }}
         {{ $disabled ? 'disabled' : '' }}
         {{ $autocomplete ? "autocomplete=\"{$autocomplete}\"" : '' }}
+        aria-describedby="{{ $helper ? $name . '_helper' : '' }} {{ $errors->has($name) ? $name . '_error' : '' }}"
         {{ $attributes->except('class')->merge(['class' => 'form-input']) }}
     >
 
     @if($helper)
-    <p class="text-xs text-gray-500 mt-1">{{ $helper }}</p>
+    <p id="{{ $name }}_helper" class="text-xs text-gray-500 mt-1">{{ $helper }}</p>
     @endif
 
     @error($name)
-    <p class="form-error">{{ $message }}</p>
+    <p id="{{ $name }}_error" class="form-error" role="alert">{{ $message }}</p>
     @enderror
 </div>

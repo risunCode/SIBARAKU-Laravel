@@ -419,3 +419,93 @@ body {
         color: #000;
     }
 }
+
+/* Sticky Table Headers */
+table thead {
+    @apply sticky top-0;
+    z-index: 5;
+    background-color: var(--bg-card, #ffffff);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Modal z-index - ensure modals are above everything */
+.modal-backdrop {
+    z-index: 40 !important;
+}
+.modal-content {
+    z-index: 50 !important;
+}
+
+table thead th {
+    @apply border-b border-gray-200;
+    border-bottom-color: var(--border-color, #e5e7eb);
+}
+
+/* Dark mode support for sticky headers */
+:is(.dark table thead) {
+    background-color: var(--bg-card, #1f2937);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+:is(.dark table thead th) {
+    border-bottom-color: var(--border-color, #374151);
+}
+
+/* Enhanced Hover States */
+button:hover:not(:disabled) {
+    @apply transition-all duration-200;
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+}
+
+.btn:hover:not(:disabled) {
+    @apply opacity-90 shadow-lg transition-all duration-200;
+}
+
+tr:hover {
+    @apply transition-colors duration-150;
+    background-color: var(--bg-hover, rgba(0, 0, 0, 0.02));
+}
+
+:is(.dark tr:hover) {
+    background-color: var(--bg-hover, rgba(255, 255, 255, 0.05));
+}
+
+a:hover:not(.btn) {
+    @apply underline transition-all duration-150;
+}
+
+.card:hover {
+    @apply shadow-lg transition-shadow duration-200;
+}
+
+/* Interactive element hover states */
+.clickable:hover,
+[role="button"]:hover,
+[onclick]:hover {
+    @apply cursor-pointer;
+}
+
+/* Icon button hover states */
+.p-1:hover:not(:disabled),
+.p-1\.5:hover:not(:disabled),
+.p-2:hover:not(:disabled) {
+    @apply bg-gray-100 rounded transition-colors duration-150;
+}
+
+:is(.dark .p-1:hover:not(:disabled)),
+:is(.dark .p-1\.5:hover:not(:disabled)), 
+:is(.dark .p-2:hover:not(:disabled)) {
+    @apply bg-gray-800;
+}
+
+/* Toast positioning improvements */
+.swal2-toast.swal2-top-end {
+    top: 1rem;
+    right: 1rem;
+}
+
+.swal2-toast.swal2-bottom-end {
+    bottom: 1rem;
+    right: 1rem;
+}

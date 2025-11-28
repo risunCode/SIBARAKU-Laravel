@@ -14,7 +14,7 @@
     <label for="{{ $name }}" class="form-label">
         {{ $label }}
         @if($required)
-        <span class="text-danger-500">*</span>
+        <span class="text-danger-500" aria-label="wajib diisi">*</span>
         @endif
     </label>
     @endif
@@ -22,8 +22,9 @@
     <select 
         name="{{ $name }}"
         id="{{ $name }}"
-        {{ $required ? 'required' : '' }}
+        {{ $required ? 'required aria-required="true"' : '' }}
         {{ $disabled ? 'disabled' : '' }}
+        aria-describedby="{{ $helper ? $name . '_helper' : '' }} {{ $errors->has($name) ? $name . '_error' : '' }}"
         {{ $attributes->except('class')->merge(['class' => 'form-select']) }}
     >
         @if($placeholder)
@@ -40,10 +41,10 @@
     </select>
 
     @if($helper)
-    <p class="text-xs text-gray-500 mt-1">{{ $helper }}</p>
+    <p id="{{ $name }}_helper" class="text-xs text-gray-500 mt-1">{{ $helper }}</p>
     @endif
 
     @error($name)
-    <p class="form-error">{{ $message }}</p>
+    <p id="{{ $name }}_error" class="form-error" role="alert">{{ $message }}</p>
     @enderror
 </div>

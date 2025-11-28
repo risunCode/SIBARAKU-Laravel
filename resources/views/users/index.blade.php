@@ -30,11 +30,11 @@
     <div class="card mb-6">
         <div class="card-body">
             <form action="{{ route('users.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <x-form.input name="search" placeholder="Cari nama/email/kode referral..." :value="request('search')" />
+                <x-search-input name="search" placeholder="Cari nama/email/kode referral..." :value="request('search')" />
 
                 <x-form.select name="role" placeholder="Semua Role" :value="request('role')">
-                    @foreach($roles as $role)
-                    <option value="{{ $role->name }}" {{ request('role') == $role->name ? 'selected' : '' }}>{{ ucfirst($role->name) }}</option>
+                    @foreach($roles as $value => $label)
+                    <option value="{{ $value }}" {{ request('role') == $value ? 'selected' : '' }}>{{ $label }}</option>
                     @endforeach
                 </x-form.select>
 
@@ -92,11 +92,9 @@
                             {{ $user->referrer?->name ?? '-' }}
                         </td>
                         <td>
-                            @foreach($user->roles as $role)
-                            <span class="badge {{ $role->name === 'super-admin' ? 'badge-danger' : ($role->name === 'admin' ? 'badge-warning' : 'badge-info') }}">
-                                {{ ucfirst($role->name) }}
+                            <span class="badge {{ $user->role === 'admin' ? 'badge-warning' : ($user->role === 'staff' ? 'badge-info' : 'badge-gray') }}">
+                                {{ ucfirst($user->role ?? 'User') }}
                             </span>
-                            @endforeach
                         </td>
                         <td>
                             @if($user->is_active)
@@ -112,7 +110,7 @@
                                 </a>
 
                                 @can('users.edit')
-                                <button onclick="openEditModal({{ json_encode($user->only(['id', 'name', 'email', 'phone', 'is_active']) + ['role' => $user->roles->first()?->name]) }})" class="p-1.5 rounded hover:bg-gray-100" title="Edit">
+                                <button onclick="openEditModal({{ json_encode($user->only(['id', 'name', 'email', 'phone', 'is_active', 'role'])) }})" class="p-1.5 rounded hover:bg-gray-100" title="Edit">
                                     <svg class="w-4 h-4" style="color: var(--accent-color);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </button>
                                 @endcan
@@ -129,7 +127,15 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center text-gray-600 py-8">Belum ada data pengguna</td>
+                        <td colspan="7">
+                            <x-empty-state 
+                                icon="users"
+                                title="Belum ada pengguna"
+                                description="Tambah pengguna baru untuk mulai mengelola tim Anda"
+                                action="{{ route('users.create') }}"
+                                actionText="Tambah Pengguna"
+                            />
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>
@@ -137,8 +143,25 @@
         </div>
         @if($users->hasPages())
         <div class="card-footer">
-            <x-pagination :paginator="$users" />
+            <div class="flex items-center justify-between">
+                <p class="text-sm text-gray-600">
+                    Menampilkan <span class="font-medium">{{ $users->firstItem() }}</span> - 
+                    <span class="font-medium">{{ $users->lastItem() }}</span> 
+                    dari <span class="font-medium">{{ $users->total() }}</span> pengguna
+                </p>
+                <div>
+                    <x-pagination :paginator="$users" />
+                </div>
+            </div>
         </div>
+        @else
+        @if($users->count() > 0)
+        <div class="card-footer">
+            <p class="text-sm text-gray-600">
+                Menampilkan <span class="font-medium">{{ $users->count() }}</span> pengguna
+            </p>
+        </div>
+        @endif
         @endif
     </div>
 
@@ -163,8 +186,8 @@
                     <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Role <span class="text-red-500">*</span></label>
                     <select name="role" id="createRole" class="input w-full" required>
                         <option value="">-- Pilih Role --</option>
-                        @foreach($roles as $role)
-                        <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
+                        @foreach($roles as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -182,6 +205,7 @@
                 </div>
                 <div class="flex items-center pt-6">
                     <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="is_active" value="0">
                         <input type="checkbox" name="is_active" id="createIsActive" value="1" class="sr-only peer" checked>
                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
                         <span class="ms-3 text-sm font-medium" style="color: var(--text-primary);">Status Aktif</span>
@@ -190,9 +214,15 @@
             </div>
             <div class="flex gap-3 mt-6 pt-4 border-t" style="border-color: var(--border-color);">
                 <button type="button" onclick="closeModal('createModal')" class="btn btn-outline flex-1">Batal</button>
-                <button type="submit" class="btn btn-primary flex-1">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                    Simpan
+                <button type="submit" class="btn btn-primary flex-1" data-loading>
+                    <span class="btn-text">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Simpan
+                    </span>
+                    <span class="btn-loading hidden">
+                        <x-loading-spinner size="sm" class="mr-2" />
+                        Menyimpan...
+                    </span>
                 </button>
             </div>
         </form>
@@ -219,13 +249,14 @@
                 <div>
                     <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Role <span class="text-red-500">*</span></label>
                     <select name="role" id="editRole" class="input w-full" required>
-                        @foreach($roles as $role)
-                        <option value="{{ $role->name }}">{{ ucfirst($role->name) }}</option>
+                        @foreach($roles as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="md:col-span-2 flex items-center">
                     <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="hidden" name="is_active" value="0">
                         <input type="checkbox" name="is_active" id="editIsActive" value="1" class="sr-only peer">
                         <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
                         <span class="ms-3 text-sm font-medium" style="color: var(--text-primary);">Status Aktif</span>
@@ -234,9 +265,15 @@
             </div>
             <div class="flex gap-3 mt-6 pt-4 border-t" style="border-color: var(--border-color);">
                 <button type="button" onclick="closeModal('editModal')" class="btn btn-outline flex-1">Batal</button>
-                <button type="submit" class="btn btn-primary flex-1">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                    Update
+                <button type="submit" class="btn btn-primary flex-1" data-loading>
+                    <span class="btn-text">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Update
+                    </span>
+                    <span class="btn-loading hidden">
+                        <x-loading-spinner size="sm" class="mr-2" />
+                        Memperbarui...
+                    </span>
                 </button>
             </div>
         </form>
@@ -248,10 +285,14 @@
         // Toast config
         const Toast = Swal.mixin({
             toast: true,
-            position: 'top-end',
+            position: 'bottom-end',
             showConfirmButton: false,
             timer: 3000,
             timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer);
+                toast.addEventListener('mouseleave', Swal.resumeTimer);
+            }
         });
 
         function copyToClipboard(text) {
@@ -267,7 +308,7 @@
         }
 
         function openEditModal(user) {
-            document.getElementById('editForm').action = `/admin/users/${user.id}`;
+            document.getElementById('editForm').action = `/pengguna/${user.id}`;
             document.getElementById('editName').value = user.name || '';
             document.getElementById('editEmail').value = user.email || '';
             document.getElementById('editPhone').value = user.phone || '';
@@ -292,7 +333,7 @@
             if (result.isConfirmed) {
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = `/admin/users/${id}`;
+                form.action = `/pengguna/${id}`;
                 form.innerHTML = `
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="_method" value="DELETE">
@@ -309,5 +350,21 @@
         @if(session()->has('error') && session('error'))
         Toast.fire({ icon: 'error', title: '{{ session("error") }}' });
         @endif
+
+        // Loading state handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('form');
+            
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    const submitBtn = form.querySelector('button[data-loading]');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.querySelector('.btn-text').classList.add('hidden');
+                        submitBtn.querySelector('.btn-loading').classList.remove('hidden');
+                    }
+                });
+            });
+        });
     </script>
 </x-app-layout>

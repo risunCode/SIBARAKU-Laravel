@@ -16,7 +16,7 @@ class CategoryController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:categories.view', only: ['index']),
+            new Middleware('permission:categories.view', only: ['index', 'show']),
             new Middleware('permission:categories.create', only: ['create', 'store']),
             new Middleware('permission:categories.edit', only: ['edit', 'update']),
             new Middleware('permission:categories.delete', only: ['destroy']),
@@ -49,7 +49,8 @@ class CategoryController extends Controller implements HasMiddleware
             }
         }
 
-        $categories = $query->orderBy('name')->paginate(15)->withQueryString();
+        $perPage = min($request->get('per_page', 15), 100); // Max 100 per page
+        $categories = $query->orderBy('name')->paginate($perPage)->withQueryString();
         $parentCategories = Category::whereNull('parent_id')->orderBy('name')->get();
 
         return view('categories.index', compact('categories', 'parentCategories'));
@@ -94,6 +95,16 @@ class CategoryController extends Controller implements HasMiddleware
 
         return redirect()->route('categories.index')
             ->with('success', 'Kategori berhasil ditambahkan.');
+    }
+
+    /**
+     * Tampilkan detail kategori.
+     */
+    public function show(Category $category): View
+    {
+        $category->loadCount('commodities');
+        $category->load(['parent', 'children']);
+        return view('categories.show', compact('category'));
     }
 
     /**

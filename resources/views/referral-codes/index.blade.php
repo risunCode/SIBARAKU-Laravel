@@ -68,6 +68,18 @@
                             </div>
                         </td>
                         <td class="px-4 py-3" style="color: var(--text-secondary);">{{ $code->description ?? '-' }}</td>
+                        <td class="px-4 py-3">
+                            @php
+                                $roleColors = [
+                                    'admin' => 'bg-red-100 text-red-800',
+                                    'staff' => 'bg-blue-100 text-blue-800', 
+                                    'user' => 'bg-gray-100 text-gray-800'
+                                ];
+                            @endphp
+                            <span class="badge {{ $roleColors[$code->role ?? 'user'] ?? 'bg-gray-100 text-gray-800' }}">
+                                {{ ucfirst($code->role ?? 'user') }}
+                            </span>
+                        </td>
                         <td class="px-4 py-3" style="color: var(--text-primary);">
                             {{ $code->used_count }}{{ $code->max_uses ? ' / ' . $code->max_uses : '' }}
                         </td>
@@ -109,7 +121,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="px-4 py-8 text-center" style="color: var(--text-secondary);">
+                        <td colspan="8" class="px-4 py-8 text-center" style="color: var(--text-secondary);">
                             Belum ada kode referral. Klik tombol "Buat Kode Baru" untuk membuat.
                         </td>
                     </tr>
@@ -146,6 +158,15 @@
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Deskripsi</label>
                     <input type="text" name="description" class="input" placeholder="Contoh: Promo Tahun Baru">
                 </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Role yang Diberikan</label>
+                    <select name="role" class="input w-full">
+                        <option value="user">User (Default)</option>
+                        <option value="staff">Staff</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <p class="text-xs mt-1" style="color: var(--text-secondary);">Role yang akan diberikan ke user saat registrasi</p>
+                </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Maks. Penggunaan</label>
@@ -153,7 +174,10 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Kadaluarsa</label>
-                        <input type="date" name="expires_at" class="input" min="{{ date('Y-m-d', strtotime('+1 day')) }}">
+                        <input type="date" name="expires_at" class="input" 
+                               min="{{ date('Y-m-d', strtotime('+1 day')) }}" 
+                               max="{{ date('Y-m-d', strtotime('+5 years')) }}">
+                        <p class="text-xs mt-1" style="color: var(--text-secondary);">Maksimal 5 tahun dari sekarang</p>
                     </div>
                 </div>
             </div>
@@ -184,6 +208,15 @@
                     <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Deskripsi</label>
                     <input type="text" name="description" id="editDescription" class="input" placeholder="Contoh: Promo Tahun Baru">
                 </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Role yang Diberikan</label>
+                    <select name="role" id="editRole" class="input w-full">
+                        <option value="user">User (Default)</option>
+                        <option value="staff">Staff</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <p class="text-xs mt-1" style="color: var(--text-secondary);">Role yang akan diberikan ke user saat registrasi</p>
+                </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Maks. Penggunaan</label>
@@ -191,7 +224,10 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-1" style="color: var(--text-primary);">Kadaluarsa</label>
-                        <input type="date" name="expires_at" id="editExpiresAt" class="input">
+                        <input type="date" name="expires_at" id="editExpiresAt" class="input"
+                               min="{{ date('Y-m-d', strtotime('+1 day')) }}" 
+                               max="{{ date('Y-m-d', strtotime('+5 years')) }}">
+                        <p class="text-xs mt-1" style="color: var(--text-secondary);">Maksimal 5 tahun dari sekarang</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
@@ -227,6 +263,7 @@
             document.getElementById('editId').value = code.id;
             document.getElementById('editCode').value = code.code;
             document.getElementById('editDescription').value = code.description || '';
+            document.getElementById('editRole').value = code.role || 'user';
             document.getElementById('editMaxUses').value = code.max_uses || '';
             document.getElementById('editExpiresAt').value = code.expires_at ? code.expires_at.split('T')[0] : '';
             document.getElementById('editIsActive').checked = code.is_active;
@@ -275,13 +312,14 @@
             
             const payload = {
                 description: formData.get('description'),
+                role: formData.get('role'),
                 max_uses: formData.get('max_uses') || null,
                 expires_at: formData.get('expires_at') || null,
                 is_active: document.getElementById('editIsActive').checked,
             };
             
             try {
-                const res = await fetch(`/admin/referral-codes/${id}`, {
+                const res = await fetch(`/kode-referral/${id}`, {
                     method: 'PUT',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
@@ -317,7 +355,7 @@
             if (!result.isConfirmed) return;
             
             try {
-                const res = await fetch(`/admin/referral-codes/${id}/toggle`, {
+                const res = await fetch(`/kode-referral/${id}/toggle`, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
@@ -351,7 +389,7 @@
             if (!result.isConfirmed) return;
             
             try {
-                const res = await fetch(`/admin/referral-codes/${id}`, {
+                const res = await fetch(`/kode-referral/${id}`, {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,

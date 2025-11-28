@@ -4,15 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
-use Spatie\Permission\Traits\HasRoles;
-
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -22,16 +22,21 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'email_verified_at',
         'password',
         'phone',
         'avatar',
         'birth_date',
         'is_active',
+        'role',
         'referral_code',
         'referred_by',
         'security_question_1',
         'security_answer_1',
+        'security_question_2',
+        'security_answer_2',
         'custom_security_question',
+        'custom_security_answer',
         'security_setup_completed',
     ];
 
@@ -101,7 +106,7 @@ class User extends Authenticatable
      */
     public function hasSecurityQuestion(): bool
     {
-        return !empty($this->security_question_1) && !empty($this->security_answer_1);
+        return $this->security_setup_completed && !empty($this->security_question_1) && !empty($this->security_answer_1);
     }
 
     /**
@@ -184,12 +189,45 @@ class User extends Authenticatable
     }
 
     /**
-     * Cek apakah bisa menambah superadmin/admin.
+     * Check if user can add admins.
      */
-    public static function canAddAdmin(): bool
+    public function canAddAdmin(): bool
     {
-        $adminCount = self::role(['super-admin', 'admin'])->count();
-        return $adminCount < 3;
+        // Only super admin (or first user) can add admins
+        return $this->id === 1;
+    }
+
+    /**
+     * Check if user is admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === \App\Enums\Role::ADMIN->value;
+    }
+
+    /**
+     * Check if user is staff.
+     */
+    public function isStaff(): bool
+    {
+        return $this->role === \App\Enums\Role::STAFF->value;
+    }
+
+    /**
+     * Check if user is regular user.
+     */
+    public function isUser(): bool
+    {
+        return $this->role === \App\Enums\Role::USER->value;
+    }
+
+    /**
+     * Get user's referral codes usage.
+     */
+    public function usedReferralCodes(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\ReferralCode::class, 'referral_code_usage')
+            ->withPivot('used_at');
     }
 
     /**

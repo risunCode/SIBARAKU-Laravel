@@ -21,6 +21,7 @@ class TransferController extends Controller implements HasMiddleware
             new Middleware('permission:transfers.view', only: ['index', 'show']),
             new Middleware('permission:transfers.create', only: ['create', 'store']),
             new Middleware('permission:transfers.approve', only: ['approve', 'reject', 'complete']),
+            new Middleware('permission:transfers.delete', only: ['destroy']),
         ];
     }
 
@@ -46,9 +47,8 @@ class TransferController extends Controller implements HasMiddleware
         }
 
         $perPage = $request->input('per_page', 15);
-        if ($perPage == 'all' || $perPage > 500) {
-            $perPage = $query->count();
-        }
+        // Max 100 per page for performance
+        $perPage = min(is_numeric($perPage) ? (int)$perPage : 15, 100);
         $transfers = $query->latest()->paginate($perPage)->withQueryString();
         
         // Data untuk modal
@@ -77,12 +77,34 @@ class TransferController extends Controller implements HasMiddleware
     {
         $validated = $request->validate([
             'commodity_id' => ['required', 'exists:commodities,id'],
-            'to_location_id' => ['required', 'exists:locations,id'],
+            'to_location_id' => ['required', function($attribute, $value, $fail) {
+                if ($value !== 'custom' && !\App\Models\Location::where('id', $value)->exists()) {
+                    $fail('Lokasi yang dipilih tidak valid.');
+                }
+            }],
+            'custom_location' => ['required_if:to_location_id,custom', 'nullable', 'string', 'max:255'],
             'reason' => ['required', 'string'],
             'notes' => ['nullable', 'string'],
         ]);
 
-        $commodity = Commodity::findOrFail($validated['commodity_id']);
+        // Handle custom location
+        if ($validated['to_location_id'] === 'custom') {
+            // Create new location from custom input
+            $location = \App\Models\Location::create([
+                'name' => $validated['custom_location'],
+                'code' => 'LOC-' . strtoupper(\Illuminate\Support\Str::random(6)),
+                'building' => 'Manual Input',
+                'floor' => null,
+                'room' => null,
+            ]);
+            $validated['to_location_id'] = $location->id;
+        }
+
+        $commodity = Commodity::find($validated['commodity_id']);
+        
+        if (!$commodity) {
+            return back()->withErrors(['commodity_id' => 'Barang tidak ditemukan dalam sistem.']);
+        }
 
         // Validasi: lokasi tujuan harus berbeda
         if ($commodity->location_id == $validated['to_location_id']) {
@@ -166,6 +188,11 @@ class TransferController extends Controller implements HasMiddleware
             return back()->with('error', 'Transfer tidak bisa diselesaikan.');
         }
 
+        // Check if commodity still exists
+        if (!$transfer->commodity) {
+            return back()->with('error', 'Tidak dapat menyelesaikan transfer. Barang sudah tidak ada dalam sistem.');
+        }
+
         // Update lokasi barang
         $transfer->commodity->update([
             'location_id' => $transfer->to_location_id,
@@ -190,7 +217,7 @@ class TransferController extends Controller implements HasMiddleware
             return back()->with('error', 'Hanya transfer dengan status pending yang bisa dibatalkan.');
         }
 
-        if ($transfer->requested_by !== Auth::id() && !Auth::user()->hasRole('admin')) {
+        if ($transfer->requested_by !== Auth::id() && Auth::user()->role !== 'admin') {
             return back()->with('error', 'Anda tidak memiliki izin untuk membatalkan transfer ini.');
         }
 

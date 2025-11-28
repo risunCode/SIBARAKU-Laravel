@@ -1,6 +1,6 @@
 # 🏢 Sistem Inventaris Barang - Kabupaten Kubu Raya
 
-**Version: 0.0.4-beta** 🎉
+**Version: 0.0.5-beta** 🎉
 
 Sistem manajemen inventaris barang yang komprehensif untuk pemerintah daerah, dibangun dengan Laravel 12 dan teknologi modern.
 
@@ -69,7 +69,46 @@ Sistem manajemen inventaris barang yang komprehensif untuk pemerintah daerah, di
 
 ## Version History
 
-### v0.0.4-beta (Current) - 27 Nov 2025
+### v0.0.5-beta (Current) - 27 Nov 2025
+
+**🔴 CRITICAL Security & Performance Fixes**
+- ✅ Rate limiting (5 attempts/min) pada login/register routes
+- ✅ MIME type validation untuk file uploads (JPEG, PNG, GIF, WebP)
+- ✅ Email lowercase consistency di semua controllers
+- ✅ User soft delete dengan migration + avatar retention untuk restore
+- ✅ Fix referral code usage increment pada registrasi baru
+- ✅ Authorization policies sudah terkonfirmasi untuk semua controllers
+
+**🟡 HIGH Priority Improvements**
+- ✅ Pagination max limit (100 items/page) untuk keamanan & performance
+- ✅ Phone number regex validation (Indonesian format: +62/0)
+- ✅ Referral code expiry validation (max 1 tahun)
+- ✅ N+1 query optimization dengan eager loading sudah confirmed
+- ✅ Comprehensive error handling dengan try-catch blocks + logging
+- ✅ CSRF audit: semua forms & AJAX requests sudah protected
+
+**🎨 UX/UI Enhancements**
+- ✅ Loading states dengan spinner component untuk form submissions
+- ✅ Rich empty states dengan icons, descriptions & CTAs
+- ✅ Search clear button dengan auto-submit
+- ✅ Pagination info display (showing X-Y of Z items)
+- ✅ Accessibility improvements (ARIA attributes, keyboard navigation, focus trap)
+- ✅ Sticky table headers dengan CSS
+- ✅ Enhanced hover states untuk semua interactive elements
+- ✅ Toast positioning improvements (bottom-end dengan hover pause)
+
+**🔒 Security & Audit Features**
+- ✅ Failed login logging dengan detailed scenarios
+- ✅ Enhanced ActivityLog labels untuk login_failed, register, transferred
+- ✅ Email sanitization pada login process
+- ✅ IP address & User Agent tracking untuk failed login attempts
+
+**📦 New Components**
+- `<x-loading-spinner>` dengan multiple sizes (sm, md, lg, xl)
+- `<x-empty-state>` dengan customizable icons, titles & actions
+- `<x-search-input>` dengan clear button functionality
+
+### v0.0.4-beta - 27 Nov 2025
 **Bug Fixes & Improvements**
 - Fix modal flash issue on page load (display:none approach)
 - Fix security questions validation (integer column issue)
