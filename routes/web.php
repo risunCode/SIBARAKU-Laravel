@@ -88,17 +88,19 @@ Route::middleware('auth')->group(function () {
             // Export (MUST be before resource routes to avoid conflict)
             Route::get('ekspor', [CommodityController::class, 'export'])->name('commodities.export');
             
-            // Debug PDF test
-            Route::get('test-pdf', function() {
-                $commodities = \App\Models\Commodity::with(['category', 'location'])->limit(5)->get();
-                $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.pdf.inventory', [
-                    'commodities' => $commodities,
-                    'title' => 'Test PDF Export',
-                    'date' => now()->format('d F Y'),
-                    'filters' => []
-                ]);
-                return $pdf->download('test-export.pdf');
-            });
+            // Debug PDF test (only in local environment)
+            if (app()->environment('local')) {
+                Route::get('test-pdf', function() {
+                    $commodities = \App\Models\Commodity::with(['category', 'location'])->limit(5)->get();
+                    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.pdf.inventory', [
+                        'commodities' => $commodities,
+                        'title' => 'Test PDF Export',
+                        'date' => now()->format('d F Y'),
+                        'filters' => []
+                    ]);
+                    return $pdf->download('test-export.pdf');
+                });
+            }
             
             Route::resource('/', CommodityController::class)->parameters(['' => 'commodity'])->names([
                 'index' => 'commodities.index',
@@ -196,18 +198,9 @@ Route::middleware('auth')->group(function () {
     // ADMIN (Pengguna, Kode Referral)
     // ========================================
     Route::prefix('admin')->group(function () {
-        // Transfer Barang
-        Route::resource('transfer', TransferController::class)->names([
-            'index' => 'transfers.index',
-            'create' => 'transfers.create',
-            'store' => 'transfers.store',
-            'show' => 'transfers.show',
-            'edit' => 'transfers.edit',
-            'update' => 'transfers.update',
-            'destroy' => 'transfers.destroy',
-        ]);
+        // NOTE: Transfer routes moved to /transaksi/transfer to avoid duplication
+        // Access transfers via: /transaksi/transfer
         
-
         // Pengguna (Users)
         Route::resource('pengguna', UserController::class)->names([
             'index' => 'users.index',
