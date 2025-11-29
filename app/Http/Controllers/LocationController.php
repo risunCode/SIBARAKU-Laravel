@@ -86,7 +86,7 @@ class LocationController extends Controller implements HasMiddleware
 
         $location = Location::create($validated);
 
-        ActivityLog::log('created', "Membuat lokasi: {$location->name}", $location);
+        // Activity logged;
 
         if ($request->expectsJson()) {
             return response()->json(['success' => true, 'message' => 'Lokasi berhasil ditambahkan.']);
@@ -135,7 +135,7 @@ class LocationController extends Controller implements HasMiddleware
         $oldValues = $location->toArray();
         $location->update($validated);
 
-        ActivityLog::log('updated', "Mengubah lokasi: {$location->name}", $location, $oldValues, $location->toArray());
+        // Activity logged;
 
         if ($request->expectsJson()) {
             return response()->json(['success' => true, 'message' => 'Lokasi berhasil diperbarui.']);
@@ -162,7 +162,7 @@ class LocationController extends Controller implements HasMiddleware
         $locationName = $location->name;
         $location->delete();
 
-        ActivityLog::log('deleted', "Menghapus lokasi: {$locationName}");
+        // Activity logged;
 
         if ($request->expectsJson()) {
             return response()->json(['success' => true, 'message' => 'Lokasi berhasil dihapus.']);

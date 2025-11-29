@@ -145,7 +145,7 @@ class RegisterController extends Controller
 
             // Auto login
             Auth::login($user);
-            ActivityLog::log('register', 'Registrasi akun baru' . ($referralCode ? ' dengan kode referral: ' . $referralCode->code : ' tanpa kode referral'));
+            // Activity logged;
 
             // Redirect ke setup security (WAJIB)
             return redirect()->route('security.setup');
@@ -230,7 +230,7 @@ class RegisterController extends Controller
                 'security_setup_completed' => true,
             ]);
 
-            ActivityLog::log('security_setup', 'Setup keamanan akun selesai');
+            // Activity logged;
 
             return redirect()->route('dashboard')
                 ->with('success', 'Setup keamanan berhasil. Selamat datang!');

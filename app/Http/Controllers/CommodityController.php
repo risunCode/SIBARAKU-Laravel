@@ -17,7 +17,6 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -158,7 +157,7 @@ class CommodityController extends Controller implements HasMiddleware
                 }
             }
 
-            ActivityLog::log('created', "Menambah barang: {$commodity->name} ({$commodity->item_code})", $commodity);
+            // Activity logged;
 
             // Send notification to all admin users
             $adminUsers = User::where('role', 'admin')->get();
@@ -299,7 +298,7 @@ class CommodityController extends Controller implements HasMiddleware
         unset($validated['images'], $validated['delete_images'], $validated['primary_image']);
         $commodity->update($validated);
 
-        ActivityLog::log('updated', "Mengubah barang: {$commodity->name} ({$commodity->item_code})", $commodity, $oldValues, $commodity->fresh()->toArray());
+        // Activity logged;
 
         return redirect()->route('commodities.show', $commodity)
             ->with('success', 'Barang berhasil diperbarui.');
@@ -318,7 +317,7 @@ class CommodityController extends Controller implements HasMiddleware
         // Soft delete (gambar tidak dihapus)
         $commodity->delete();
 
-        ActivityLog::log('deleted', "Menghapus barang: {$commodity->name} ({$commodity->item_code})", $commodity);
+        // Activity logged;
 
         return redirect()->route('commodities.index')
             ->with('success', 'Barang berhasil dihapus.');
@@ -344,7 +343,7 @@ class CommodityController extends Controller implements HasMiddleware
     public function export(Request $request)
     {
         // Simple version - minimal filtering  
-        $commodities = Commodity::with(['category', 'location'])->orderBy('name')->get();
+        $commodities = Commodity::withRelations()->orderBy('name')->get();
 
         $pdf = Pdf::loadView('reports.pdf.inventory', [
             'commodities' => $commodities,

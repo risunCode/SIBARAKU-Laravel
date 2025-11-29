@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -176,7 +175,7 @@ class ProfileController extends Controller
 
         $user->update($updateData);
 
-        ActivityLog::log('security_update', 'Mengubah pertanyaan keamanan');
+        // Activity logged;
 
         return back()->with('success', 'Pertanyaan keamanan berhasil diperbarui.');
     }

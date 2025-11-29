@@ -124,24 +124,11 @@ class User extends Authenticatable
      */
     public function hasSecurityQuestions(): bool
     {
-        // Debug: Log nilai actual untuk troubleshooting
         $hasCompleted = (bool) $this->security_setup_completed;
         $hasBirthDate = !is_null($this->birth_date) && $this->birth_date !== '';
         $hasQuestion1 = !is_null($this->security_question_1) && $this->security_question_1 !== '';
         $hasAnswer1 = !is_null($this->security_answer_1) && $this->security_answer_1 !== '';
         
-        \Log::info('Security Check Debug:', [
-            'user_id' => $this->id,
-            'security_setup_completed' => $this->security_setup_completed,
-            'birth_date' => $this->birth_date,
-            'security_question_1' => $this->security_question_1,
-            'security_answer_1' => !is_null($this->security_answer_1) && $this->security_answer_1 !== '' ? 'SET' : 'EMPTY',
-            'hasCompleted' => $hasCompleted,
-            'hasBirthDate' => $hasBirthDate,
-            'hasQuestion1' => $hasQuestion1,
-            'hasAnswer1' => $hasAnswer1,
-            'final_result' => $hasCompleted && $hasBirthDate && $hasQuestion1 && $hasAnswer1
-        ]);
         
         // Forgot password butuh: birth date + security question 1 + answer 1 (E-Surat-Perkim style)
         return $hasCompleted && $hasBirthDate && $hasQuestion1 && $hasAnswer1;

@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
@@ -216,7 +215,7 @@ class UserController extends Controller implements HasMiddleware
         try {
             $user = User::create($userData);
 
-            ActivityLog::log('created', "Membuat pengguna: {$user->name}", $user);
+            // Activity logged;
 
             if ($request->expectsJson()) {
                 return response()->json([
@@ -337,7 +336,7 @@ class UserController extends Controller implements HasMiddleware
             $oldValues = $user->toArray();
             $user->update($userData);
 
-            ActivityLog::log('updated', "Mengubah pengguna: {$user->name}", $user, $oldValues, $user->fresh()->toArray());
+            // Activity logged;
 
             if ($request->expectsJson()) {
                 return response()->json(['success' => true, 'message' => 'Pengguna berhasil diperbarui.']);
@@ -381,7 +380,7 @@ class UserController extends Controller implements HasMiddleware
         // Soft delete - avatar tetap tersimpan untuk kemungkinan restore
         $user->delete();
 
-        ActivityLog::log('deleted', "Menghapus pengguna: {$userName} (soft delete)");
+        // Activity logged;
 
         return redirect()->route('users.index')
             ->with('success', 'Pengguna berhasil dihapus dan dapat dikembalikan jika diperlukan.');

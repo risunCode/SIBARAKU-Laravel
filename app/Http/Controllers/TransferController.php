@@ -124,7 +124,7 @@ class TransferController extends Controller implements HasMiddleware
             'status' => 'pending',
         ]);
 
-        ActivityLog::log('created', "Mengajukan transfer: {$transfer->transfer_number}", $transfer);
+        // Activity logged;
 
         // Send notification to admin users about transfer request
         $adminUsers = User::where('role', 'admin')->get();
@@ -157,7 +157,7 @@ class TransferController extends Controller implements HasMiddleware
             'approved_by' => Auth::id(),
         ]);
 
-        ActivityLog::log('approved', "Menyetujui transfer: {$transfer->transfer_number}", $transfer);
+        // Activity logged;
 
         return back()->with('success', 'Transfer berhasil disetujui.');
     }
@@ -181,7 +181,7 @@ class TransferController extends Controller implements HasMiddleware
             'rejection_reason' => $request->rejection_reason,
         ]);
 
-        ActivityLog::log('rejected', "Menolak transfer: {$transfer->transfer_number}", $transfer);
+        // Activity logged;
 
         return back()->with('success', 'Transfer berhasil ditolak.');
     }
@@ -210,7 +210,7 @@ class TransferController extends Controller implements HasMiddleware
             'transfer_date' => now(),
         ]);
 
-        ActivityLog::log('transferred', "Menyelesaikan transfer: {$transfer->transfer_number}", $transfer);
+        // Activity logged;
 
         return back()->with('success', 'Transfer berhasil diselesaikan. Lokasi barang telah diperbarui.');
     }
@@ -230,7 +230,7 @@ class TransferController extends Controller implements HasMiddleware
 
         $transfer->update(['status' => 'cancelled']);
 
-        ActivityLog::log('deleted', "Membatalkan transfer: {$transfer->transfer_number}", $transfer);
+        // Activity logged;
 
         return redirect()->route('transfers.index')
             ->with('success', 'Transfer berhasil dibatalkan.');

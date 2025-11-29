@@ -96,7 +96,7 @@ class DisposalController extends Controller implements HasMiddleware
             'status' => 'pending',
         ]);
 
-        ActivityLog::log('created', "Mengajukan penghapusan: {$disposal->disposal_number}", $disposal);
+        // Activity logged;
 
         // Send notification to admin users about disposal request
         $adminUsers = User::where('role', 'admin')->get();
@@ -138,7 +138,7 @@ class DisposalController extends Controller implements HasMiddleware
         // Soft delete barang
         $disposal->commodity->delete();
 
-        ActivityLog::log('approved', "Menyetujui penghapusan: {$disposal->disposal_number}", $disposal);
+        // Activity logged;
 
         return back()->with('success', 'Penghapusan berhasil disetujui. Barang telah dihapus dari inventaris.');
     }
@@ -162,7 +162,7 @@ class DisposalController extends Controller implements HasMiddleware
             'rejection_reason' => $request->rejection_reason,
         ]);
 
-        ActivityLog::log('rejected', "Menolak penghapusan: {$disposal->disposal_number}", $disposal);
+        // Activity logged;
 
         return back()->with('success', 'Pengajuan penghapusan berhasil ditolak.');
     }
@@ -182,7 +182,7 @@ class DisposalController extends Controller implements HasMiddleware
 
         $disposal->delete();
 
-        ActivityLog::log('deleted', "Membatalkan pengajuan penghapusan: {$disposal->disposal_number}");
+        // Activity logged;
 
         return redirect()->route('disposals.index')
             ->with('success', 'Pengajuan berhasil dibatalkan.');

@@ -60,7 +60,7 @@ class DashboardController extends Controller implements HasMiddleware
             ->count();
 
         // Barang terbaru
-        $recentCommodities = Commodity::with(['category', 'location'])
+        $recentCommodities = Commodity::withRelations()
             ->latest()
             ->limit(5)
             ->get();

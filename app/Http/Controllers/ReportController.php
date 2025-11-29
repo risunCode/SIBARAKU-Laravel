@@ -36,7 +36,7 @@ class ReportController extends Controller implements HasMiddleware
      */
     public function inventory(Request $request)
     {
-        $query = Commodity::with(['category', 'location']);
+        $query = Commodity::withRelations();
 
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
@@ -134,7 +134,7 @@ class ReportController extends Controller implements HasMiddleware
     public function byCondition(Request $request)
     {
         // Get all commodities untuk detailed list
-        $commodities = Commodity::with(['category', 'location'])
+        $commodities = Commodity::withRelations()
             ->orderBy('condition')
             ->orderBy('name')
             ->get()

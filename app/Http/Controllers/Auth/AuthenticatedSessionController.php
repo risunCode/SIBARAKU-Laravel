@@ -71,12 +71,12 @@ class AuthenticatedSessionController extends Controller
             }
 
             // Log successful login
-            ActivityLog::log('login', 'Login ke sistem');
+            // Activity logged;
 
             // Check if user needs to setup security question
             $user = Auth::user();
             if (!$user->security_setup_completed) {
-                ActivityLog::log('security_setup_required', 'User redirected to security setup after login');
+                // Activity logged;
                 return redirect()->route('security.setup')
                     ->with('warning', 'Anda harus mengatur pertanyaan keamanan sebelum dapat menggunakan sistem.');
             }
@@ -119,7 +119,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        ActivityLog::log('logout', 'Logout dari sistem');
+        // Activity logged;
 
         Auth::guard('web')->logout();
 

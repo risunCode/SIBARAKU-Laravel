@@ -156,11 +156,19 @@ class Commodity extends Model
     }
 
     /**
-     * Foto-foto barang.
+     * Get the commodity's images.
      */
     public function images(): HasMany
     {
-        return $this->hasMany(CommodityImage::class)->orderBy('sort_order');
+        return $this->hasMany(CommodityImage::class);
+    }
+
+    /**
+     * Scope to include category and location relationships.
+     */
+    public function scopeWithRelations($query)
+    {
+        return $query->with(['category', 'location']);
     }
 
     /**

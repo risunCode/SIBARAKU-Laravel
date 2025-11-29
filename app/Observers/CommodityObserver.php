@@ -6,7 +6,6 @@ use App\Models\Commodity;
 use App\Models\Transfer;
 use App\Models\Disposal;
 use App\Models\Maintenance;
-use Illuminate\Support\Facades\Log;
 
 class CommodityObserver
 {
@@ -16,7 +15,7 @@ class CommodityObserver
      */
     public function deleting(Commodity $commodity): void
     {
-        Log::info("Cleaning up records for commodity: {$commodity->name} (ID: {$commodity->id})");
+        // Cleaning up related records
 
         // Cancel pending transfers
         $pendingTransfers = Transfer::where('commodity_id', $commodity->id)
@@ -55,7 +54,7 @@ class CommodityObserver
         // Delete all maintenance records (they're tied to the commodity)
         Maintenance::where('commodity_id', $commodity->id)->delete();
 
-        Log::info("Finished cleaning up records for commodity ID: {$commodity->id}");
+        // Cleanup completed
     }
 
     /**
@@ -64,7 +63,7 @@ class CommodityObserver
      */
     public function restored(Commodity $commodity): void
     {
-        Log::info("Commodity restored: {$commodity->name} (ID: {$commodity->id})");
+        // Commodity restored successfully
         
         // Note: We don't restore deleted transfers/disposals/maintenance
         // because they might have been intentionally cleaned up

@@ -87,7 +87,7 @@ class CategoryController extends Controller implements HasMiddleware
 
         $category = Category::create($validated);
 
-        ActivityLog::log('created', "Membuat kategori: {$category->name}", $category);
+        // Activity logged;
 
         if ($request->expectsJson()) {
             return response()->json(['success' => true, 'message' => 'Kategori berhasil ditambahkan.']);
@@ -146,7 +146,7 @@ class CategoryController extends Controller implements HasMiddleware
         $oldValues = $category->toArray();
         $category->update($validated);
 
-        ActivityLog::log('updated', "Mengubah kategori: {$category->name}", $category, $oldValues, $category->toArray());
+        // Activity logged;
 
         if ($request->expectsJson()) {
             return response()->json(['success' => true, 'message' => 'Kategori berhasil diperbarui.']);
@@ -182,7 +182,7 @@ class CategoryController extends Controller implements HasMiddleware
         $categoryName = $category->name;
         $category->delete();
 
-        ActivityLog::log('deleted', "Menghapus kategori: {$categoryName}");
+        // Activity logged;
 
         if ($request->expectsJson()) {
             return response()->json(['success' => true, 'message' => 'Kategori berhasil dihapus.']);
