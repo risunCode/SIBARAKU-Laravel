@@ -1,6 +1,6 @@
 # 🛣️ SIBARANG - Routing Documentation
 
-**Total Routes: 94** (Optimized from 101) | **Last Updated:** November 29, 2025
+**Total Routes: 121** (94 Web + 27 API) | **Last Updated:** November 29, 2025
 
 ---
 
@@ -33,7 +33,7 @@
 | **Transactions** | 24 | `auth` | MEDIUM |
 | **Reports** | 9 | `auth` | HIGH (PDF generation) |
 | **Admin** | 10 | `auth` | MEDIUM |
-| **API** | 1 | `throttle` | LOW |
+| **API** | 28 | `sanctum` | LOW |
 | **System** | 7 | various | LOW |
 
 ### Route Prefix Structure
@@ -273,17 +273,82 @@
 
 ---
 
-## 🔌 API Routes
+## 🔌 API Routes (28 Endpoints)
 
-**File:** `routes/api.php` (auto-prefixed with `/api`)
+**File:** `routes/api.php` | **Base URL:** `/api/v1/...` | **Auth:** Sanctum
 
-| Method | URI | Name | Controller | Rate Limit |
-|--------|-----|------|------------|------------|
-| GET | `/api/validate-referral` | `api.validate-referral` | `RegisterController@validateReferral` | 10/min |
+### Public API (No Auth)
 
-**Note:** Other API-style routes remain in `web.php` for Blade template compatibility:
-- `/master/barang/preview-code` → `commodities.preview-code`
-- `/master/barang/ekspor` → `commodities.export`
+| Method | URI | Name | Rate Limit |
+|--------|-----|------|------------|
+| GET | `/api/validate-referral` | `api.validate-referral` | 10/min |
+
+### Dashboard & Statistics
+
+| Method | URI | Name | Description |
+|--------|-----|------|-------------|
+| GET | `/api/v1/user` | `api.user` | Current user info |
+| GET | `/api/v1/dashboard/stats` | `api.dashboard.stats` | Main statistics |
+| GET | `/api/v1/dashboard/conditions` | `api.dashboard.conditions` | Condition chart data |
+| GET | `/api/v1/dashboard/by-category` | `api.dashboard.by-category` | Category chart data |
+| GET | `/api/v1/dashboard/by-location` | `api.dashboard.by-location` | Location chart data |
+
+### Commodities
+
+| Method | URI | Name | Description |
+|--------|-----|------|-------------|
+| GET | `/api/v1/commodities` | `api.commodities.index` | List (paginated, filterable) |
+| GET | `/api/v1/commodities/{id}` | `api.commodities.show` | Single item detail |
+| GET | `/api/v1/commodities/code/preview` | `api.commodities.preview-code` | Preview item code |
+| GET | `/api/v1/commodities/search/quick` | `api.commodities.search` | Quick search |
+
+### Categories & Locations
+
+| Method | URI | Name | Description |
+|--------|-----|------|-------------|
+| GET | `/api/v1/categories` | `api.categories.index` | List all categories |
+| GET | `/api/v1/categories/{id}` | `api.categories.show` | Category with items |
+| GET | `/api/v1/locations` | `api.locations.index` | List all locations |
+| GET | `/api/v1/locations/{id}` | `api.locations.show` | Location with items |
+
+### Transfers
+
+| Method | URI | Name | Description |
+|--------|-----|------|-------------|
+| GET | `/api/v1/transfers` | `api.transfers.index` | List (filterable) |
+| GET | `/api/v1/transfers/pending/count` | `api.transfers.pending-count` | Pending count |
+| GET | `/api/v1/transfers/{id}` | `api.transfers.show` | Transfer detail |
+
+### Maintenance
+
+| Method | URI | Name | Description |
+|--------|-----|------|-------------|
+| GET | `/api/v1/maintenance` | `api.maintenance.index` | List logs |
+| GET | `/api/v1/maintenance/upcoming` | `api.maintenance.upcoming` | Due in 30 days |
+| GET | `/api/v1/maintenance/overdue` | `api.maintenance.overdue` | Overdue items |
+
+### Disposals
+
+| Method | URI | Name | Description |
+|--------|-----|------|-------------|
+| GET | `/api/v1/disposals` | `api.disposals.index` | List (filterable) |
+| GET | `/api/v1/disposals/pending/count` | `api.disposals.pending-count` | Pending count |
+
+### Notifications
+
+| Method | URI | Name | Description |
+|--------|-----|------|-------------|
+| GET | `/api/v1/notifications/unread/count` | `api.notifications.unread-count` | Unread count |
+| GET | `/api/v1/notifications/recent` | `api.notifications.recent` | Recent 10 |
+| POST | `/api/v1/notifications/{id}/read` | `api.notifications.read` | Mark as read |
+| POST | `/api/v1/notifications/read-all` | `api.notifications.read-all` | Mark all read |
+
+### Search & Activity
+
+| Method | URI | Name | Description |
+|--------|-----|------|-------------|
+| GET | `/api/v1/search?q=...` | `api.search` | Global search |
+| GET | `/api/v1/activities/recent` | `api.activities.recent` | Recent activities |
 
 ---
 
@@ -396,7 +461,8 @@ Route::middleware('permission:referral-codes.manage')->group(function () {
 | Enable route caching | - | ~200-500% faster | 📋 TODO (production) |
 | Consolidate report routes | 4 routes | ~3% faster | ⏭️ SKIPPED |
 
-**Optimization Applied:** 101 → 94 routes (~7% reduction) ✅
+**Web Routes Optimized:** 101 → 94 routes (~7% reduction) ✅
+**API Routes Added:** 28 endpoints for mobile/AJAX integration ✅
 
 ---
 
