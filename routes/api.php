@@ -34,6 +34,19 @@ Route::middleware('throttle:10,1')->group(function () {
     // Validate Referral Code
     Route::get('validate-referral', [RegisterController::class, 'validateReferral'])
         ->name('api.validate-referral');
+    
+    // Health check & public stats (for testing)
+    Route::get('health', fn() => response()->json([
+        'status' => 'ok',
+        'timestamp' => now()->toISOString(),
+        'version' => config('app.version', '0.0.7-beta'),
+    ]))->name('api.health');
+    
+    Route::get('stats/public', fn() => response()->json([
+        'total_commodities' => \App\Models\Commodity::count(),
+        'total_categories' => \App\Models\Category::count(),
+        'total_locations' => \App\Models\Location::count(),
+    ]))->name('api.stats.public');
 });
 
 /*
@@ -42,7 +55,8 @@ Route::middleware('throttle:10,1')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('v1')->group(function () {
+// Use 'auth:sanctum' for mobile apps, 'auth' for web session-based auth
+Route::middleware(['auth', 'throttle:60,1'])->prefix('v1')->group(function () {
     
     // ========================================
     // USER & AUTH

@@ -7,7 +7,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div>
                     <h1 class="text-3xl md:text-4xl font-bold mb-4" style="color: var(--text-primary);">Sistem Inventaris Barang</h1>
-                    <p class="text-lg mb-6" style="color: var(--text-secondary);">Dikembangkan oleh <span class="font-semibold" style="color: var(--accent-color);">Ferdi</span> - Solusi modern untuk pengelolaan aset dan inventaris dengan fitur lengkap, tracking real-time, dan laporan komprehensif.</p>
+                    <p class="text-lg mb-6" style="color: var(--text-secondary);">Dikembangkan untuk Solusi modern untuk pengelolaan aset dan inventaris dengan fitur lengkap, tracking real-time, dan laporan komprehensif.</p>
                     <div class="flex flex-wrap gap-3">
                         <span class="px-3 py-1 rounded-full text-sm" style="background-color: var(--bg-input); color: var(--text-secondary);">v1.0.0</span>
                         <span class="px-3 py-1 rounded-full text-sm" style="background-color: var(--bg-input); color: var(--text-secondary);">Laravel 12</span>
