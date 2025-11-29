@@ -32,7 +32,7 @@ php artisan db:seed --class="Database\MigrationsDemo\DemoSeeder"
 ```
 
 **Data Produksi:**
-- 1 User Admin (admin@inventaris.com / panelsibarang)
+- 1 User Admin (admin@inventaris.com / panelsibaraku)
 - 5 Kategori: ATK, ELK, KMP, TIK, PRT
 - 5 Lokasi: GU, GB, RS, RD, RM  
 - 3 Kode Referral: ADMIN2025, STAFF2025, DEMO2025
@@ -51,7 +51,7 @@ php artisan serve
 ```
 
 **Akses:** http://127.0.0.1:8000  
-**Login:** admin@inventaris.com / panelsibarang
+**Login:** admin@inventaris.com / panelsibaraku
 
 ### Akses dari Luar (ngrok)
 
@@ -117,6 +117,7 @@ php artisan cache:clear
 - [Pemecahan Masalah](#pemecahan-masalah)
 - [Dukungan Browser](#dukungan-browser)
 - [Riwayat Versi](#riwayat-versi)
+- [Panduan Deployment](DEPLOYMENT.md)
 
 ---
 
@@ -287,7 +288,7 @@ php artisan serve
 ### Login Default
 | Email | Password | Role |
 |-------|----------|------|
-| admin@inventaris.com | panelsibarang | Admin |
+| admin@inventaris.com | panelsibaraku | Admin |
 
 > Login pertama memerlukan pengaturan keamanan (tanggal lahir dan pertanyaan keamanan).
 

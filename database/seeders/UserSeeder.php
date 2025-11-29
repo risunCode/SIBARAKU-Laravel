@@ -16,9 +16,9 @@ class UserSeeder extends Seeder
     {
         // Admin user
         $admin = User::create([
-            'name' => 'Administrator SIBARANG',
+            'name' => 'Administrator SIBARAKU',
             'email' => 'admin@inventaris.com',
-            'password' => Hash::make('panelsibarang'),
+            'password' => Hash::make('panelsibaraku'),
             'phone' => '+6281234567890',
             'birth_date' => '1990-01-01',
             'is_active' => true,
@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
 
         $this->command->info('✅ Admin user created successfully');
         $this->command->info("   Email: admin@inventaris.com");
-        $this->command->info("   Password: panelsibarang");
+        $this->command->info("   Password: panelsibaraku");
         $this->command->info("   Security Setup: Completed (default)");
     }
 }
