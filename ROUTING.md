@@ -32,7 +32,7 @@
 | **Master Data** | 23 | `auth` | MEDIUM |
 | **Transactions** | 24 | `auth` | MEDIUM |
 | **Reports** | 9 | `auth` | HIGH (PDF generation) |
-| **Admin** | 17 | `auth` | MEDIUM |
+| **Admin** | 10 | `auth` | MEDIUM |
 | **API** | 1 | `throttle` | LOW |
 | **System** | 7 | various | LOW |
 
@@ -78,7 +78,6 @@
 └── kib                     → Kartu Inventaris Barang
 
 /admin                      → Admin Panel
-├── transfer/               → Transfer management
 ├── pengguna/               → User management
 └── kode-referral/          → Referral codes
 ```
@@ -249,20 +248,6 @@
 
 ## 👑 Admin Routes
 
-### Transfer Management - Prefix: `/admin/transfer`
-
-⚠️ **DUPLICATE ROUTES DETECTED** - Same as `/transaksi/transfer`
-
-| Method | URI | Name | Controller |
-|--------|-----|------|------------|
-| GET | `/admin/transfer` | `transfers.index` | `TransferController@index` |
-| GET | `/admin/transfer/create` | `transfers.create` | `TransferController@create` |
-| POST | `/admin/transfer` | `transfers.store` | `TransferController@store` |
-| GET | `/admin/transfer/{transfer}` | `transfers.show` | `TransferController@show` |
-| GET | `/admin/transfer/{transfer}/edit` | `transfers.edit` | `TransferController@edit` |
-| PUT/PATCH | `/admin/transfer/{transfer}` | `transfers.update` | `TransferController@update` |
-| DELETE | `/admin/transfer/{transfer}` | `transfers.destroy` | `TransferController@destroy` |
-
 ### User Management (Pengguna) - Prefix: `/admin/pengguna`
 
 | Method | URI | Name | Controller |
@@ -401,9 +386,9 @@ Route::middleware('permission:referral-codes.manage')->group(function () {
 |--------------|--------------|------------------|--------|
 | Remove duplicate transfer routes | 7 routes | ~5% faster | ✅ DONE |
 | Secure debug route | 1 route (prod) | Security | ✅ DONE |
-| Enable route caching | - | ~200-500% faster | � TODO |
-| Consolidate report routes | 4 routes | ~3% faster | � OPTIONAL |
-| Move API routes | - | Clean code | � OPTIONAL |
+| Enable route caching | - | ~200-500% faster | 📋 TODO |
+| Consolidate report routes | 4 routes | ~3% faster | 📋 OPTIONAL |
+| Move API routes | - | Clean code | 📋 OPTIONAL |
 
 **Optimization Applied:** 101 → 94 routes (~7% reduction) ✅
 
