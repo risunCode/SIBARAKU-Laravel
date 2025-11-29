@@ -1,4 +1,4 @@
-# 📦 SIBARANG - Technical Specification
+# 📦 SIBARAKU - Technical Specification
 ## Complete Implementation Reference for Cloning
 
 **Version: 1.0.0** | ✅ Production Ready | 🎯 v1.0.0 Stable
@@ -11,7 +11,7 @@
 
 ## 🎯 Overview
 
-### SIBARANG - Sistem Inventaris Barang
+### SIBARAKU - Sistem Inventaris Barang Kabupaten Kubu Raya
 **Aplikasi inventaris barang berbasis web yang lengkap dan production-ready** untuk instansi pemerintah, BUMN/BUMD, dan perusahaan swasta.
 
 ### ✅ Implementation Status: COMPLETED
@@ -757,7 +757,7 @@ APP_URL=http://localhost:8000
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=sibarang
+DB_DATABASE=sibaraku
 DB_USERNAME=root
 DB_PASSWORD=
 ```
@@ -861,7 +861,7 @@ Replace files in `public/images/`:
 
 ---
 
-**SIBARANG is production-ready and fully implemented! Clone, customize, and deploy for your organization today.** 🎉
+**SIBARAKU is production-ready and fully implemented! Clone, customize, and deploy for your organization today.** 🎉
 
 ---
 

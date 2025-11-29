@@ -271,8 +271,8 @@
 
         <!-- App Info -->
         <div class="rounded-xl border p-6 text-center" style="background-color: var(--bg-card); border-color: var(--border-color);">
-            <h2 class="text-2xl font-bold mb-2" style="color: var(--text-primary);">SIBARANG</h2>
-            <p class="text-sm" style="color: var(--text-secondary);">Sistem Inventaris Barang</p>
+            <h2 class="text-2xl font-bold mb-2" style="color: var(--text-primary);">SIBARAKU</h2>
+            <p class="text-sm" style="color: var(--text-secondary);">Sistem Inventaris Barang Kabupaten Kubu Raya</p>
             <p class="text-xs mt-1" style="color: var(--text-secondary);">Version {{ config('sibarang.version', '1.0.0') }}</p>
         </div>
 

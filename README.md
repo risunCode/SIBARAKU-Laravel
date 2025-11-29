@@ -1,8 +1,17 @@
-# SIBARANG - Sistem Inventaris Barang
+# SIBARAKU - Sistem Inventaris Barang Kabupaten Kubu Raya
 
-**Versi: v1.0.0**
+**Versi: v1.0.0-public**
 
-Sistem manajemen inventaris barang untuk instansi pemerintah, BUMN/BUMD, dan perusahaan swasta. Dibangun dengan Laravel 12.
+Sistem manajemen inventaris barang untuk instansi pemerintah, BUMN/BUMD, dan perusahaan swasta. Dibangun dengan Laravel 12, SIBARAKU menyediakan solusi digital untuk pengelolaan aset dan barang inventaris layaknya aplikasi e-inventory yang digunakan di kementerian dan lembaga pemerintahan. Sistem ini mendukung pencatatan, pemeliharaan, transfer, hingga penghapusan barang dengan workflow approval yang terstruktur, dilengkapi dengan pelaporan komprehensif dan audit trail yang memenuhi standar akuntabilitas pemerintahan.
+
+## Catatan Penamaan
+
+**SIBARAKU** adalah nama terbaru dari sistem ini. Sebelumnya aplikasi ini bernama **SIBARANG** (Sistem Inventaris Barang), namun karena ditemukan proyek dengan nama yang sama, untuk menghindari konflik dan kebingungan, kami mengubah nama menjadi **SIBARAKU** (Sistem Inventaris Barang Kubu Raya) yang lebih spesifik dan mencerminkan target pengguna utama yaitu Kabupaten Kubu Raya.
+
+---
+
+### 📋 TODO
+- [ ] **PDF Export Enhancement** - Meningkatkan kualitas dan tampilan PDF export yang saat ini masih basic
 
 ---
 
@@ -107,22 +116,22 @@ php artisan serve
 ### Dashboard
 Dashboard real-time dengan visualisasi data dan monitoring status barang.
 
-<img width="1920" height="1080" alt="Dashboard SIBARANG" src="https://github.com/user-attachments/assets/aa9c0f47-6dc0-4851-95fa-5d45c9869b03" />
+<img width="1920" height="1080" alt="Dashboard SIBARAKU" src="https://github.com/user-attachments/assets/aa9c0f47-6dc0-4851-95fa-5d45c9869b03" />
 
 ### Detail Barang
 Interface detail barang dengan galeri dan informasi lengkap.
 
-<img width="1920" height="1080" alt="Detail Barang SIBARANG" src="https://github.com/user-attachments/assets/8bd6e9c0-1fe2-4bff-9e04-620d8c5b4319" />
+<img width="1920" height="1080" alt="Detail Barang SIBARAKU" src="https://github.com/user-attachments/assets/8bd6e9c0-1fe2-4bff-9e04-620d8c5b4319" />
 
 ### Tentang Sistem
 Halaman informasi sistem dan teknologi yang digunakan.
 
-<img width="1920" height="1080" alt="About SIBARANG" src="https://github.com/user-attachments/assets/a6edcd66-32ee-4e1c-882f-9f03668aa37f" />
+<img width="1920" height="1080" alt="About SIBARAKU" src="https://github.com/user-attachments/assets/a6edcd66-32ee-4e1c-882f-9f03668aa37f" />
 
 ### About Dark Mode
 Dark mode untuk meningkatkan kenyamanan pengguna di malam hari.
 
-<img width="1920" height="1080" alt="About SIBARANG Dark Mode" src="https://github.com/user-attachments/assets/a078aa43-03a6-4989-af75-73a485119efd" />
+<img width="1920" height="1080" alt="About SIBARAKU Dark Mode" src="https://github.com/user-attachments/assets/a078aa43-03a6-4989-af75-73a485119efd" />
 
 ---
 
@@ -169,7 +178,7 @@ php artisan key:generate
 
 Edit file `.env`:
 ```env
-APP_NAME="SIBARANG - Sistem Inventaris Barang"
+APP_NAME="SIBARAKU - Sistem Inventaris Barang Kubu Raya"
 APP_ENV=local
 APP_DEBUG=true
 APP_URL=http://localhost:8000
@@ -177,14 +186,14 @@ APP_URL=http://localhost:8000
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=sibarang_inventaris
+DB_DATABASE=sibaraku_inventaris
 DB_USERNAME=root
 DB_PASSWORD=your_password
 ```
 
 ### Langkah 4: Setup Database
 ```bash
-mysql -u root -p -e "CREATE DATABASE sibarang_inventaris"
+mysql -u root -p -e "CREATE DATABASE sibaraku_inventaris"
 php artisan migrate:fresh --seed
 ```
 
@@ -250,10 +259,10 @@ chown -R www-data:www-data storage bootstrap/cache
 ### Konfigurasi Apache
 ```apache
 <VirtualHost *:80>
-    DocumentRoot /path/to/sibarang/public
+    DocumentRoot /path/to/sibaraku/public
     ServerName yourdomain.com
     
-    <Directory /path/to/sibarang/public>
+    <Directory /path/to/sibaraku/public>
         AllowOverride All
         Require all granted
     </Directory>
@@ -265,7 +274,7 @@ chown -R www-data:www-data storage bootstrap/cache
 server {
     listen 80;
     server_name yourdomain.com;
-    root /path/to/sibarang/public;
+    root /path/to/sibaraku/public;
     
     index index.php;
     

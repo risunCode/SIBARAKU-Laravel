@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| API Routes - SIBARANG Inventory System
+| API Routes - SIBARAKU Inventory System
 |--------------------------------------------------------------------------
 |
 | Routes here are automatically prefixed with /api

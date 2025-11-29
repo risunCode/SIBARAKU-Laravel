@@ -1,4 +1,4 @@
-# CHANGELOG - SIBARANG
+# CHANGELOG - SIBARAKU
 **Sistem Inventaris Barang**
 
 ---
@@ -455,7 +455,7 @@ php artisan db:seed --class="Database\Seeders\Demo\DemoSeeder"
 
 ---
 
-**SIBARANG v1.0.0 is now stable and production-ready with comprehensive UI/UX enhancements, security-first database structure, and complete feature set!** 🎉
+**SIBARAKU v1.0.0 is now stable and production-ready with comprehensive UI/UX enhancements, security-first database structure, and complete feature set!** 🎉
 
 ---
 

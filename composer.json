@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "sibarang/inventaris-barang",
+    "name": "sibaraku/inventaris-barang",
     "type": "project",
-    "description": "SIBARANG - Sistem Inventaris Barang",
-    "keywords": ["laravel", "inventory", "sibarang"],
+    "description": "SIBARAKU - Sistem Inventaris Barang Kabupaten Kubu Raya",
+    "keywords": ["laravel", "inventory", "sibaraku", "kubu-raya"],
     "license": "GPL-3.0-or-later",
     "version": "1.0.0",
     "require": {

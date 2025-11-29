@@ -1,7 +1,7 @@
 {
-    "name": "sibarang",
+    "name": "sibaraku",
     "version": "1.0.0",
-    "description": "SIBARANG - Sistem Inventaris Barang",
+    "description": "SIBARAKU - Sistem Inventaris Barang Kabupaten Kubu Raya",
     "private": true,
     "type": "module",
     "scripts": {
