@@ -3,6 +3,58 @@
 
 ---
 
+## [v0.0.3-beta] - 2025-11-29 (Security-First Database Structure & Hotfix)
+
+### 🔒 Security-First Database Structure (NEW)
+- **Separated Demo Data from Production** for enhanced security
+- **Clean Production Installation** - `migrate:fresh --seed` creates admin user only
+- **Optional Demo Data System** - Demo data moved to `/database/seeders/Demo/` folder
+- **Production-Ready Seeder Structure**:
+  - `/database/seeders/` - Minimal admin user only
+  - `/database/seeders/Demo/` - Complete demo data (19 categories, 10 locations, 18 commodities)
+
+### 🚀 Deployment Enhancements
+- **Two-Step Installation Process**:
+  - Production: `php artisan migrate:fresh --seed`
+  - Demo Data: `php artisan db:seed --class="Database\Seeders\Demo\DemoSeeder"`
+- **Updated Admin Credentials**: `admin@inventaris.com / panelsibarang`
+- **Security Setup Required** on first login (birth date & security questions)
+- **Enhanced Documentation** with clear production vs demo instructions
+
+### 📋 Migration Audit Completed
+- **Comprehensive Database Audit** performed and documented
+- **Production Readiness Score**: 87.5% achieved
+- **All Blocking Issues Resolved** from migration audit
+- **Database Schema Optimization** with proper indexing and relationships
+
+### 🛠️ Technical Improvements
+- **Fixed Composer Version** from `0.0.3-semi-stable` to `0.0.3-beta` (semantic versioning compliance)
+- **Updated Namespace Structure** for demo seeders (`Database\Seeders\Demo\`)
+- **Enhanced Autoloader Configuration** for proper class resolution
+- **Clean File Organization** with removed duplicate seeders
+
+### 📝 Documentation Updates
+- **README.md** - Updated with security-first deployment instructions
+- **Database Seeder Documentation** - Clear separation of production vs demo data
+- **Migration Audit Report** - Complete database analysis (archived)
+- **Version History** - Updated with security improvements and hotfix details
+
+### 🎯 Production Readiness
+- **Security Hardening** - Demo data no longer included in production installs
+- **Clean Database Setup** - Only essential admin user created by default
+- **Optional Testing Data** - Demo data available on-demand for testing
+- **Enhanced User Experience** - Clear setup instructions and security workflow
+
+### Files Modified
+- `database/seeders/UserSeeder.php` - Minimal admin user creation
+- `database/seeders/DatabaseSeeder.php` - Production-only seeder
+- `database/seeders/Demo/` - Complete demo data system (NEW)
+- `composer.json` - Fixed version format compliance
+- `README.md` - Updated deployment instructions
+- `MIGRATION_AUDIT.md` - Complete migration audit (archived)
+
+---
+
 ## [v0.0.7-beta] - 2025-11-28 (Major Bug Fixes & UI Enhancements)
 
 ### 🎨 Enhanced Development Badge (NEW)

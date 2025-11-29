@@ -1,6 +1,6 @@
 # 🏢 SIBARANG - Sistem Inventaris Barang
 
-**Version: v0.0.3-semi-stable** 🎉
+**Version: v0.0.3-beta** 🎉
 
 Sistem manajemen inventaris barang yang komprehensif untuk instansi pemerintah, BUMN/BUMD, dan perusahaan swasta. Dibangun dengan Laravel 12 dan teknologi modern.
 
@@ -13,9 +13,19 @@ Sistem manajemen inventaris barang yang komprehensif untuk instansi pemerintah, 
 git clone https://github.com/risunCode/inventaris_barang_laravel.git your-inventory
 cd your-inventory && composer install && npm install
 cp .env.example .env && php artisan key:generate
-php artisan migrate && php artisan db:seed
+php artisan migrate:fresh --seed
 npm run build && php artisan serve
 ```
+
+### With Demo Data (For Testing/Demo)
+```bash
+# After production setup, add demo data:
+php artisan db:seed --class="Database\Seeders\Demo\DemoSeeder"
+```
+**Demo Data Includes:**
+- 19 Categories (ATK, ELK, KMP, TIK, KBM, etc.)
+- 10 Office Locations (Gedung Utama, Belakang, etc.)
+- 18 Sample Commodities (laptop, printer, mobil, etc.)
 
 ### Development Mode (with Hot Reload)
 ```bash
@@ -29,7 +39,7 @@ php artisan serve
 > ⚠️ **Note:** Development mode requires **2 terminals** running simultaneously for Hot Module Reload (HMR) to work properly.
 
 🎉 **Access:** http://127.0.0.1:8000  
-🔑 **Login:** admin@inventory.com / password
+🔑 **Login:** admin@inventaris.com / panelsibarang
 
 📋 **Need customization?** See our [Deployment Guide](DEPLOYMENT.md) and [Customization Guide](CUSTOMIZATION.md)
 
@@ -213,9 +223,11 @@ DB_PASSWORD=your_password
 # Buat database
 mysql -u root -p -e "CREATE DATABASE sibarang_inventaris"
 
-# Jalankan migrations dan seeder
-php artisan migrate
-php artisan db:seed
+# Production: Clean install with admin user only
+php artisan migrate:fresh --seed
+
+# Optional: Add demo data for testing
+php artisan db:seed --class="Database\Seeders\Demo\DemoSeeder"
 ```
 
 #### Step 5: Storage Setup
@@ -235,9 +247,11 @@ php artisan serve
 **Akses:** http://127.0.0.1:8000
 
 ### Default Login
-| Email | Password | Role |
-|-------|----------|------|
-| admin@inventaris.com | admin123456 | Admin |
+| Email | Password | Role | Security Setup |
+|-------|----------|------|----------------|
+| admin@inventaris.com | panelsibarang | Admin | Required (not completed) |
+
+> ⚠️ **Security Note:** First login requires completing security setup (birth date & security questions) for password reset functionality.
 
 ---
 
@@ -256,7 +270,16 @@ APP_DEBUG=false
 APP_URL=https://yourdomain.com
 ```
 
-#### 3. Laravel Optimization
+#### 3. Database Setup (Production)
+```bash
+# Clean production install (admin user only)
+php artisan migrate:fresh --seed
+
+# For testing/demo environments only:
+php artisan db:seed --class="Database\Seeders\Demo\DemoSeeder"
+```
+
+#### 4. Laravel Optimization
 ```bash
 php artisan config:cache
 php artisan route:cache
@@ -264,7 +287,7 @@ php artisan view:cache
 php artisan optimize
 ```
 
-#### 4. PHP Settings (php.ini)
+#### 5. PHP Settings (php.ini)
 ```ini
 upload_max_filesize = 10M
 post_max_size = 50M
@@ -281,13 +304,13 @@ extension=pdo_mysql
 extension=zip
 ```
 
-#### 5. File Permissions (Linux)
+#### 6. File Permissions (Linux)
 ```bash
 chmod -R 775 storage bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache
 ```
 
-#### 6. Web Server Configuration
+#### 7. Web Server Configuration
 
 **Apache (.htaccess already included)**
 ```apache
@@ -385,15 +408,24 @@ php artisan view:clear
 
 ## 📝 Latest Updates
 
-### vv0.0.3-semi-stable (Current) - 28 Nov 2025
+### v0.0.3-beta (Current) - 29 Nov 2025
 
 **🎯 Major Highlights:**
+- ✅ **Security-First Database Structure** - Separated demo data from production migrations
+- ✅ **Clean Production Installation** - `migrate:fresh --seed` creates admin user only
+- ✅ **Optional Demo Data System** - Demo data moved to `/database/seeders/Demo/` folder
 - ✅ **Enhanced Development Badge** - Professional indicator dengan network info
 - ✅ **Added Screenshots Section** - Visual showcase of dashboard, detail barang, dan about pages
 - ✅ **Fixed Export PDF 404 errors** - Route precedence resolved
 - ✅ **Advanced Profile Photo Cropping** - Fixed circular crop area dengan keyboard shortcuts
 - ✅ **Fixed User Profile 404 errors** - Permission middleware resolved
 - ✅ **UI/UX Improvements** - Transfer thumbnails, terminology cleanup, smart currency display
+
+**🔒 Security Improvements:**
+- Production installs no longer include demo data by default
+- Admin credentials: `admin@inventaris.com / panelsibarang`
+- Security setup required on first login
+- Demo data accessible via separate command only
 
 **📋 Complete changelog:** [CHANGELOG.md](CHANGELOG.md)
 
