@@ -10,6 +10,15 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    // Development server configuration for proper HMR
+    server: {
+        host: '127.0.0.1',
+        port: 5173,
+        strictPort: true,
+        hmr: {
+            host: '127.0.0.1',
+        },
+    },
     build: {
         // Optimize chunk size
         rollupOptions: {

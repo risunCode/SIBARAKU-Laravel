@@ -8,7 +8,7 @@ Sistem manajemen inventaris barang yang komprehensif untuk instansi pemerintah, 
 
 ## 🚀 Quick Start for Organizations
 
-**Clone & Setup in 5 Minutes:**
+### Production Mode (Recommended)
 ```bash
 git clone https://github.com/risunCode/inventaris_barang_laravel.git your-inventory
 cd your-inventory && composer install && npm install
@@ -16,6 +16,17 @@ cp .env.example .env && php artisan key:generate
 php artisan migrate && php artisan db:seed
 npm run build && php artisan serve
 ```
+
+### Development Mode (with Hot Reload)
+```bash
+# Terminal 1 - Vite Dev Server (Hot Reload)
+npm run dev
+
+# Terminal 2 - Laravel Server
+php artisan serve
+```
+
+> ⚠️ **Note:** Development mode requires **2 terminals** running simultaneously for Hot Module Reload (HMR) to work properly.
 
 🎉 **Access:** http://127.0.0.1:8000  
 🔑 **Login:** admin@inventory.com / password
