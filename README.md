@@ -53,14 +53,65 @@ php artisan serve
 **Akses:** http://127.0.0.1:8000  
 **Login:** admin@inventaris.com / panelsibarang
 
+### Akses dari Luar (ngrok)
+
+Untuk mengakses aplikasi dari perangkat lain atau berbagi sementara:
+
+**1. Install ngrok:**
+```bash
+# Windows (via Chocolatey)
+choco install ngrok
+
+# macOS (via Homebrew)
+brew install ngrok
+
+# Atau download langsung dari https://ngrok.com/download
+```
+
+**2. Daftar & Auth:**
+```bash
+# Daftar gratis di https://ngrok.com lalu:
+ngrok config add-authtoken YOUR_AUTH_TOKEN
+```
+
+**3. Jalankan Server:**
+```bash
+# Terminal 1 - Laravel (pastikan bind ke semua IP)
+php artisan serve --host=0.0.0.0 --port=8000
+
+# Terminal 2 - Vite (untuk development)
+npm run dev -- --host
+
+# Terminal 3 - ngrok tunnel
+ngrok http 8000
+```
+
+**4. Update `.env`:**
+```env
+# Ganti dengan URL dari ngrok (contoh: https://abc123.ngrok-free.app)
+APP_URL=https://your-ngrok-url.ngrok-free.app
+SESSION_DOMAIN=.ngrok-free.app
+SANCTUM_STATEFUL_DOMAINS=your-ngrok-url.ngrok-free.app
+```
+
+**5. Clear Cache:**
+```bash
+php artisan config:clear
+php artisan cache:clear
+```
+
+> ⚠️ **Catatan:** URL ngrok gratis berubah setiap restart. Untuk URL tetap, gunakan ngrok berbayar atau alternatif seperti [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/).
+
 ---
 
 ## Daftar Isi
 
 - [Instalasi Cepat](#instalasi-cepat)
+- [Akses dari Luar (ngrok)](#akses-dari-luar-ngrok)
 - [Fitur Utama](#fitur-utama)
 - [Tangkapan Layar](#tangkapan-layar)
 - [Teknologi](#teknologi)
+- [Struktur Database](#struktur-database)
 - [Panduan Instalasi](#panduan-instalasi)
 - [Konfigurasi Produksi](#konfigurasi-produksi)
 - [Pemecahan Masalah](#pemecahan-masalah)
@@ -145,6 +196,29 @@ Dark mode untuk meningkatkan kenyamanan pengguna di malam hari.
 | Frontend | Tailwind CSS, Alpine.js, Chart.js |
 | Permission | Spatie Laravel Permission |
 | PDF | DomPDF |
+
+---
+
+## Struktur Database
+
+Entity Relationship Diagram (ERD) dari sistem SIBARAKU:
+
+<img width="1920" alt="Database Structure SIBARAKU" src="https://github.com/user-attachments/assets/94ea2684-844c-4374-a587-959d1bdb57aa" />
+
+**Total: 17 Tabel Utama**
+- `users` - Manajemen pengguna dengan fitur keamanan
+- `categories` - Kategori barang (hierarki)
+- `locations` - Lokasi penyimpanan
+- `commodities` - Data barang inventaris
+- `commodity_images` - Galeri foto barang
+- `transfers` - Mutasi/pemindahan barang
+- `maintenances` - Riwayat pemeliharaan
+- `disposals` - Penghapusan barang
+- `activity_logs` - Audit trail
+- `notifications` - Notifikasi sistem
+- `referral_codes` - Kode referral registrasi
+
+> 📁 File SQL tersedia di `database/sibaraku-full.sql` dan `database/sibaraku-drawdb.sql`
 
 ---
 
