@@ -106,8 +106,6 @@ class MaintenanceController extends Controller implements HasMiddleware
             $maintenanceLog->commodity->update(['condition' => $validated['condition_after']]);
         }
 
-        // Activity logged;
-
         // Send notification to admin users about maintenance
         $adminUsers = User::where('role', 'admin')->get();
         Notification::send($adminUsers, new MaintenanceScheduled($maintenanceLog, Auth::user()));
@@ -153,10 +151,7 @@ class MaintenanceController extends Controller implements HasMiddleware
 
         $validated['cost'] = $validated['cost'] ?? 0;
 
-        $oldValues = $maintenance->toArray();
         $maintenance->update($validated);
-
-        // Activity logged;
 
         return redirect()->route('maintenance.show', $maintenance)
             ->with('success', 'Log maintenance berhasil diperbarui.');
@@ -168,8 +163,6 @@ class MaintenanceController extends Controller implements HasMiddleware
     public function destroy(Maintenance $maintenance): RedirectResponse
     {
         $maintenance->delete();
-
-        // Activity logged;
 
         return redirect()->route('maintenance.index')
             ->with('success', 'Log maintenance berhasil dihapus.');

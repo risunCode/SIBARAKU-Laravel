@@ -19,19 +19,25 @@
     <!-- Filters -->
     <div class="card mb-6">
         <div class="card-body">
-            <form action="{{ route('transfers.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <x-form.input name="search" placeholder="Cari nomor transfer..." :value="request('search')" />
-                <x-form.select name="status" placeholder="Semua Status" :value="request('status')" :options="[
-                    'pending' => 'Pending',
-                    'approved' => 'Disetujui',
-                    'rejected' => 'Ditolak',
-                    'completed' => 'Selesai',
-                    'cancelled' => 'Dibatalkan'
-                ]" />
-                <div class="flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-1">Filter</button>
-                    <a href="{{ route('transfers.index') }}" class="btn btn-outline">Reset</a>
+            <form id="filterForm" action="{{ route('transfers.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-3 gap-4" data-no-warn>
+                <div class="relative">
+                    <input type="text" name="search" id="searchInput" class="input w-full pl-10" placeholder="Cari nomor transfer..." value="{{ request('search') }}" oninput="debounceSearch()">
+                    <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <div id="searchSpinner" class="hidden absolute right-3 top-1/2 -translate-y-1/2">
+                        <svg class="animate-spin h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </div>
                 </div>
+
+                <select name="status" class="input w-full" onchange="submitFilter()">
+                    <option value="">Semua Status</option>
+                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Disetujui</option>
+                    <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
+                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Selesai</option>
+                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
+                </select>
+
+                <a href="{{ route('transfers.index') }}" class="btn btn-outline">Reset</a>
             </form>
         </div>
     </div>
@@ -45,9 +51,6 @@
                         <th class="w-12">No</th>
                         <th>No. Transfer</th>
                         <th>Barang</th>
-                        <th>Dari</th>
-                        <th>Ke</th>
-                        <th>Pengaju</th>
                         <th>Status</th>
                         <th>Tanggal</th>
                         <th class="text-right">Aksi</th>
@@ -86,9 +89,6 @@
                             <span class="text-gray-400">Barang tidak tersedia</span>
                             @endif
                         </td>
-                        <td class="text-gray-600">{{ $transfer->fromLocation->name }}</td>
-                        <td class="text-gray-600">{{ $transfer->toLocation->name }}</td>
-                        <td>{{ $transfer->requester->name }}</td>
                         <td><span class="badge {{ $transfer->status_badge_class }}">{{ $transfer->status_label }}</span></td>
                         <td class="text-gray-600">{{ $transfer->created_at->format('d M Y') }}</td>
                         <td>
@@ -99,13 +99,19 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9" class="text-center text-gray-600 py-8">Belum ada data transfer</td>
+                        <td colspan="9">
+                            <x-empty-state 
+                                icon="transfer"
+                                title="Belum Ada Transfer"
+                                description="Buat transfer pertama Anda untuk memindahkan barang antar lokasi"
+                            />
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-        @if($transfers->hasPages())
+        @if($transfers->hasPages() || $transfers->count() > 0)
         <div class="card-footer">
             <x-pagination :paginator="$transfers" />
         </div>
@@ -152,4 +158,29 @@
             </div>
         </form>
     </x-modal>
+
+    <script>
+        function submitFilter() {
+            const form = document.getElementById('filterForm');
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+            
+            for (const [key, value] of formData.entries()) {
+                if (value) params.append(key, value);
+            }
+            
+            window.location.href = form.action + '?' + params.toString();
+        }
+
+        let searchTimeout;
+        function debounceSearch() {
+            const spinner = document.getElementById('searchSpinner');
+            if (spinner) spinner.classList.remove('hidden');
+            
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                submitFilter();
+            }, 500);
+        }
+    </script>
 </x-app-layout>

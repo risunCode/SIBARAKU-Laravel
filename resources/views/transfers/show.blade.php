@@ -86,6 +86,10 @@
                 </div>
             </div>
 
+                    </div>
+
+        <!-- Right Column (1/3) -->
+        <div class="space-y-6">
             <!-- Reason -->
             <div class="card">
                 <div class="card-header">
@@ -112,10 +116,7 @@
                 </div>
             </div>
             @endif
-        </div>
 
-        <!-- Right Column (1/3) -->
-        <div class="space-y-6">
             <!-- Actions -->
             @if($transfer->status === 'pending')
             <div class="card">

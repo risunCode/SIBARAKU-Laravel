@@ -45,8 +45,27 @@ class LocationController extends Controller implements HasMiddleware
             $query->where('building', $request->building);
         }
 
+        // Sorting
+        $sortField = $request->get('sort', 'name');
+        $sortDirection = $request->get('direction', 'asc');
+        
+        // Validate sort field
+        $allowedSorts = ['code', 'name', 'building', 'floor', 'commodities_count'];
+        if (!in_array($sortField, $allowedSorts)) {
+            $sortField = 'name';
+        }
+        
+        // Validate direction
+        $sortDirection = in_array(strtolower($sortDirection), ['asc', 'desc']) ? $sortDirection : 'asc';
+
+        if ($sortField === 'commodities_count') {
+            $query->orderBy('commodities_count', $sortDirection);
+        } else {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
         $perPage = min($request->get('per_page', 15), 100); // Max 100 per page
-        $locations = $query->orderBy('name')->paginate($perPage)->withQueryString();
+        $locations = $query->paginate($perPage)->withQueryString();
         $buildings = Location::distinct()->pluck('building')->filter();
 
         return view('locations.index', compact('locations', 'buildings'));

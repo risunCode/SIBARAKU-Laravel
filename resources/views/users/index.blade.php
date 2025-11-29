@@ -52,21 +52,29 @@
     <!-- Filters -->
     <div class="card mb-6">
         <div class="card-body">
-            <form action="{{ route('users.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <x-search-input name="search" placeholder="Cari nama/email/kode referral..." :value="request('search')" />
+            <form id="filterForm" action="{{ route('users.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-4 gap-4" data-no-warn>
+                <div class="relative">
+                    <input type="text" name="search" id="searchInput" class="input w-full pl-10" placeholder="Cari nama/email/kode referral..." value="{{ request('search') }}" oninput="debounceSearch()">
+                    <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <div id="searchSpinner" class="hidden absolute right-3 top-1/2 -translate-y-1/2">
+                        <svg class="animate-spin h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    </div>
+                </div>
 
-                <x-form.select name="role" placeholder="Semua Role" :value="request('role')">
+                <select name="role" class="input w-full" onchange="submitFilter()">
+                    <option value="">Semua Role</option>
                     @foreach($roles as $value => $label)
                     <option value="{{ $value }}" {{ request('role') == $value ? 'selected' : '' }}>{{ $label }}</option>
                     @endforeach
-                </x-form.select>
+                </select>
 
-                <x-form.select name="status" placeholder="Semua Status" :value="request('status')" :options="['active' => 'Aktif', 'inactive' => 'Nonaktif']" />
+                <select name="status" class="input w-full" onchange="submitFilter()">
+                    <option value="">Semua Status</option>
+                    <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
+                    <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Nonaktif</option>
+                </select>
 
-                <div class="flex gap-2">
-                    <button type="submit" class="btn btn-primary flex-1">Filter</button>
-                    <a href="{{ route('users.index') }}" class="btn btn-outline">Reset</a>
-                </div>
+                <a href="{{ route('users.index') }}" class="btn btn-outline">Reset</a>
             </form>
         </div>
     </div>
@@ -164,27 +172,10 @@
                 </tbody>
             </table>
         </div>
-        @if($users->hasPages())
+        @if($users->hasPages() || $users->count() > 0)
         <div class="card-footer">
-            <div class="flex items-center justify-between">
-                <p class="text-sm text-gray-600">
-                    Menampilkan <span class="font-medium">{{ $users->firstItem() }}</span> - 
-                    <span class="font-medium">{{ $users->lastItem() }}</span> 
-                    dari <span class="font-medium">{{ $users->total() }}</span> pengguna
-                </p>
-                <div>
-                    <x-pagination :paginator="$users" />
-                </div>
-            </div>
+            <x-pagination :paginator="$users" />
         </div>
-        @else
-        @if($users->count() > 0)
-        <div class="card-footer">
-            <p class="text-sm text-gray-600">
-                Menampilkan <span class="font-medium">{{ $users->count() }}</span> pengguna
-            </p>
-        </div>
-        @endif
         @endif
     </div>
 
@@ -353,7 +344,7 @@
         }
 
         function openEditModal(user) {
-            document.getElementById('editForm').action = `/pengguna/${user.id}`;
+            document.getElementById('editForm').action = `/master/pengguna/${user.id}`;
             document.getElementById('editName').value = user.name || '';
             document.getElementById('editEmail').value = user.email || '';
             document.getElementById('editPhone').value = user.phone || '';
@@ -378,7 +369,7 @@
             if (result.isConfirmed) {
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = `/pengguna/${id}`;
+                form.action = `/master/pengguna/${id}`;
                 form.innerHTML = `
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="_method" value="DELETE">
@@ -386,6 +377,29 @@
                 document.body.appendChild(form);
                 form.submit();
             }
+        }
+
+        function submitFilter() {
+            const form = document.getElementById('filterForm');
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+            
+            for (const [key, value] of formData.entries()) {
+                if (value) params.append(key, value);
+            }
+            
+            window.location.href = form.action + '?' + params.toString();
+        }
+
+        let searchTimeout;
+        function debounceSearch() {
+            const spinner = document.getElementById('searchSpinner');
+            if (spinner) spinner.classList.remove('hidden');
+            
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                submitFilter();
+            }, 500);
         }
 
         // Show session messages

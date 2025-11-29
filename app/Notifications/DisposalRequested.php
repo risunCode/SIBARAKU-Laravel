@@ -53,7 +53,7 @@ class DisposalRequested extends Notification
             'reason' => $this->disposal->reason,
             'reason_label' => $reasonLabel,
             'method' => $this->disposal->method,
-            'disposal_date' => $this->disposal->disposal_date->format('d/m/Y'),
+            'disposal_date' => $this->disposal->disposal_date?->format('d/m/Y') ?? 'N/A',
             'requester_name' => $this->requester->name,
             'action_url' => route('disposals.show', $this->disposal),
             'icon' => 'trash',

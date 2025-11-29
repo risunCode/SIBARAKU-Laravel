@@ -985,6 +985,90 @@
             }
         });
 
+        // Mobile Sidebar Auto-Close
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth < 1024) {
+                        // Close sidebar on mobile after navigation
+                        document.body.dispatchEvent(new CustomEvent('sidebar-close'));
+                        setTimeout(() => {
+                            const sidebarData = Alpine.$data(document.body);
+                            if (sidebarData && sidebarData.sidebarOpen !== undefined) {
+                                sidebarData.sidebarOpen = false;
+                            }
+                        }, 150);
+                    }
+                });
+            });
+        });
+
+        // Global Keyboard Shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + K = Focus search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.focus();
+                    searchInput.select();
+                }
+            }
+            
+            // Ctrl/Cmd + N = New item (open create modal)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                const createButton = document.querySelector('[onclick*="openCreateModal"]') || 
+                                   document.querySelector('[onclick*="openModal"]');
+                if (createButton) createButton.click();
+            }
+            
+            // ESC = Close modal
+            if (e.key === 'Escape') {
+                const openModal = document.querySelector('.modal-backdrop[style*="display: block"]');
+                if (openModal) {
+                    const modalId = openModal.id.replace('-backdrop', '');
+                    if (typeof closeModal === 'function') {
+                        closeModal(modalId);
+                    }
+                }
+            }
+        });
+
+        // Back to Top Button
+        document.addEventListener('DOMContentLoaded', function() {
+            const backToTop = document.createElement('button');
+            backToTop.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>';
+            backToTop.className = 'fixed bottom-6 right-6 p-3 rounded-full shadow-lg transition-all duration-300 opacity-0 pointer-events-none z-50 hover:scale-110';
+            backToTop.style.cssText = 'background-color: var(--accent-color); color: white;';
+            backToTop.setAttribute('aria-label', 'Kembali ke atas');
+            backToTop.setAttribute('title', 'Kembali ke atas (Home key)');
+            
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            
+            document.body.appendChild(backToTop);
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTop.style.opacity = '1';
+                    backToTop.style.pointerEvents = 'auto';
+                } else {
+                    backToTop.style.opacity = '0';
+                    backToTop.style.pointerEvents = 'none';
+                }
+            });
+            
+            // Home key also scrolls to top
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Home' && !e.target.matches('input, textarea')) {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        });
+
         // Toggle Password Visibility
         function togglePasswordVisibility(inputId) {
             const input = document.getElementById(inputId);

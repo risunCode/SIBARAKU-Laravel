@@ -42,7 +42,7 @@ class MaintenanceScheduled extends Notification
             'commodity_name' => $this->maintenance->commodity->name,
             'commodity_code' => $this->maintenance->commodity->item_code,
             'maintenance_description' => $this->maintenance->description,
-            'maintenance_date' => $this->maintenance->maintenance_date->format('d/m/Y'),
+            'maintenance_date' => $this->maintenance->maintenance_date?->format('d/m/Y') ?? 'N/A',
             'technician' => $this->maintenance->performed_by,
             'cost' => number_format($this->maintenance->cost, 0, ',', '.'),
             'scheduler_name' => $this->scheduler->name,

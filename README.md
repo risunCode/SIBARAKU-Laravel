@@ -1,14 +1,14 @@
-# 🏢 SIBARANG - Sistem Inventaris Barang
+# SIBARANG - Sistem Inventaris Barang
 
-**Version: v0.0.3-beta** 🎉
+**Versi: v1.0.0**
 
-Sistem manajemen inventaris barang yang komprehensif untuk instansi pemerintah, BUMN/BUMD, dan perusahaan swasta. Dibangun dengan Laravel 12 dan teknologi modern.
+Sistem manajemen inventaris barang untuk instansi pemerintah, BUMN/BUMD, dan perusahaan swasta. Dibangun dengan Laravel 12.
 
 ---
 
-## 🚀 Quick Start for Organizations
+## Instalasi Cepat
 
-### Production Mode (Recommended)
+### Mode Produksi
 ```bash
 git clone https://github.com/risunCode/inventaris_barang_laravel.git your-inventory
 cd your-inventory && composer install && npm install
@@ -17,187 +17,151 @@ php artisan migrate:fresh --seed
 npm run build && php artisan serve
 ```
 
-### With Demo Data (For Testing/Demo)
+### Dengan Data Demo
 ```bash
-# After production setup, add demo data:
-php artisan db:seed --class="Database\Seeders\Demo\DemoSeeder"
+php artisan db:seed --class="Database\MigrationsDemo\DemoSeeder"
 ```
-**Demo Data Includes:**
-- 19 Categories (ATK, ELK, KMP, TIK, KBM, etc.)
-- 10 Office Locations (Gedung Utama, Belakang, etc.)
-- 18 Sample Commodities (laptop, printer, mobil, etc.)
 
-### Development Mode (with Hot Reload)
+**Data Produksi:**
+- 1 User Admin (admin@inventaris.com / panelsibarang)
+- 5 Kategori: ATK, ELK, KMP, TIK, PRT
+- 5 Lokasi: GU, GB, RS, RD, RM  
+- 3 Kode Referral: ADMIN2025, STAFF2025, DEMO2025
+
+**Data Demo (Opsional):**
+- 10 Lokasi tambahan
+- 18 Sampel barang inventaris
+
+### Mode Pengembangan
 ```bash
-# Terminal 1 - Vite Dev Server (Hot Reload)
+# Terminal 1 - Vite Dev Server
 npm run dev
 
 # Terminal 2 - Laravel Server
 php artisan serve
 ```
 
-> ⚠️ **Note:** Development mode requires **2 terminals** running simultaneously for Hot Module Reload (HMR) to work properly.
-
-🎉 **Access:** http://127.0.0.1:8000  
-🔑 **Login:** admin@inventaris.com / panelsibarang
-
-📋 **Need customization?** See our [Deployment Guide](DEPLOYMENT.md) and [Customization Guide](CUSTOMIZATION.md)
+**Akses:** http://127.0.0.1:8000  
+**Login:** admin@inventaris.com / panelsibarang
 
 ---
 
-## 📋 Daftar Isi
+## Daftar Isi
 
-- [🚀 Quick Start for Organizations](#-quick-start-for-organizations)
-- [🚀 Features Utama](#-features-utama)
-- [📸 Screenshots](#-screenshots)
-- [🛠️ Technical Stack](#️-technical-stack)
-- [📚 Documentation Guides](#-documentation-guides)
-  - [🚀 Deployment Guide](-deployment-guide)
-  - [🎨 Customization Guide](-customization-guide)
-- [🚀 Installation & Deployment Guide](#-installation--deployment-guide)
-  - [Prerequisites](#prerequisites)
-  - [Quick Start (Development)](#quick-start-development)
-  - [Default Login](#default-login)
-  - [Production Deployment](#production-deployment)
-  - [LAN Hosting (Optional)](#lan-hosting-optional)
-  - [Troubleshooting](#troubleshooting)
-- [📱 Browser Support](#-browser-support)
-- [📝 Version History](#-version-history)
+- [Instalasi Cepat](#instalasi-cepat)
+- [Fitur Utama](#fitur-utama)
+- [Tangkapan Layar](#tangkapan-layar)
+- [Teknologi](#teknologi)
+- [Panduan Instalasi](#panduan-instalasi)
+- [Konfigurasi Produksi](#konfigurasi-produksi)
+- [Pemecahan Masalah](#pemecahan-masalah)
+- [Dukungan Browser](#dukungan-browser)
+- [Riwayat Versi](#riwayat-versi)
 
 ---
 
-## 🚀 Features Utama
+## Fitur Utama
 
-### 📊 Dashboard & Analytics
+### Dashboard dan Analitik
 - Dashboard real-time dengan Chart.js
 - Statistik kondisi barang (Donut chart)
 - Distribusi per kategori (Bar chart)  
-- Alerts untuk approval pending
-- Sticky navigation untuk UX yang lebih baik
+- Notifikasi approval pending
 
-### 🗂️ Master Data Management
-- **Categories**: CRUD dengan modal edit/delete + SweetAlert
-- **Locations**: CRUD dengan modal edit/delete + SweetAlert  
-- **Commodities**: CRUD lengkap dengan gallery preview
-- Image gallery dengan zoom, drag, dan navigasi
+### Pengelolaan Data Master
+- **Kategori**: Operasi CRUD dengan modal dan notifikasi
+- **Lokasi**: Pengelolaan lokasi penyimpanan barang
+- **Barang**: CRUD lengkap dengan galeri gambar
+- Galeri gambar dengan zoom dan navigasi
 
-### 💼 Transaction Management
-- **Transfers**: Workflow approval dengan status tracking
-- **Maintenance**: Scheduling dan log pemeliharaan
-- **Disposals**: Proses penghapusan barang dengan approval
+### Manajemen Transaksi
+- **Transfer**: Workflow persetujuan dengan pelacakan status
+- **Pemeliharaan**: Penjadwalan dan log perawatan barang
+- **Penghapusan**: Proses disposal dengan sistem approval
 
-### 👥 User Management & Profile
-- **Role-based Access Control (RBAC)** dengan Spatie Laravel Permission
-- **Modal-based operations** untuk create/edit users
-- **Referral Code System** untuk registrasi user baru
-- User details dengan wide layout dan stats
-- **Advanced Profile Management** dengan crop photo functionality
-  - **Image Cropping** dengan Cropper.js - fixed circular crop area
-  - **Drag & Zoom** untuk positioning gambar dalam circle
-  - **Keyboard Shortcuts** (Zoom: +/-, Rotate: R, Reset: Space, Save: Enter, Cancel: Esc)
-  - **File Validation** (type, size) dengan user-friendly error messages
-  - **Real-time Upload** dengan loading states dan progress feedback
+### Pengelolaan Pengguna
+- Role-based Access Control dengan Spatie Laravel Permission
+- Sistem kode referral untuk registrasi
+- Manajemen profil dengan fitur crop foto
+- Pintasan keyboard untuk crop gambar
 
-### 📝 Reporting System
-- Multiple report types (Inventory, By Category, By Location, dll)
-- **PDF Export** dengan custom styling
-- Modern card-based report selection interface
-- Print-friendly layouts
+### Sistem Laporan
+- Berbagai jenis laporan (Inventaris, Per Kategori, Per Lokasi)
+- Ekspor PDF dengan styling kustom
+- Layout ramah cetak
 
-### 🔔 Notification & Activity
-- Real-time notification system
-- **Activity logging** untuk audit trail
-- Notification bell dengan counter
-- Activity exclusion untuk login events
+### Notifikasi dan Aktivitas
+- Sistem notifikasi real-time
+- Pencatatan aktivitas untuk audit trail
 
-### 🎨 UI/UX Enhancements
-- **CSS Variables theming** untuk konsistensi
-- **SweetAlert integration** untuk feedback yang lebih baik
-- **Modal system** untuk operasi CRUD
-- **Gallery lightbox** untuk preview gambar
-- Responsive design untuk semua device sizes
-- Enhanced error handling (development vs production)
+### Antarmuka Pengguna
+- Theming dengan CSS Variables
+- Integrasi SweetAlert untuk feedback
+- Sistem modal untuk operasi CRUD
+- Desain responsif untuk semua ukuran layar
 
 ---
 
-## 📸 Screenshots
+## Tangkapan Layar
 
-### 🏠 Dashboard Analytics
-Dashboard real-time dengan visualisasi data komprehensif dan monitoring status barang.
+### Dashboard
+Dashboard real-time dengan visualisasi data dan monitoring status barang.
 
 <img width="1920" height="1080" alt="Dashboard SIBARANG" src="https://github.com/user-attachments/assets/aa9c0f47-6dc0-4851-95fa-5d45c9869b03" />
 
-### 📦 Detail Barang
-Interface detail barang yang informatif dengan gallery preview dan informasi lengkap.
+### Detail Barang
+Interface detail barang dengan galeri dan informasi lengkap.
 
 <img width="1920" height="1080" alt="Detail Barang SIBARANG" src="https://github.com/user-attachments/assets/8bd6e9c0-1fe2-4bff-9e04-620d8c5b4319" />
 
-### ℹ️ About System
-Halaman about dengan informasi sistem lengkap dan teknologi yang digunakan.
+### Tentang Sistem
+Halaman informasi sistem dan teknologi yang digunakan.
 
 <img width="1920" height="1080" alt="About SIBARANG" src="https://github.com/user-attachments/assets/a6edcd66-32ee-4e1c-882f-9f03668aa37f" />
 
----
+### About Dark Mode
+Dark mode untuk meningkatkan kenyamanan pengguna di malam hari.
 
-## 🛠️ Technical Stack
-
-- **Laravel**: 12.40.1
-- **PHP**: 8.3.23
-- **Database**: MySQL/SQLite  
-- **Frontend**: Tailwind CSS + Alpine.js + Chart.js
-- **Permissions**: Spatie Laravel Permission
-- **PDF**: DomPDF
-- **Notifications**: Laravel native notifications
+<img width="1920" height="1080" alt="About SIBARANG Dark Mode" src="https://github.com/user-attachments/assets/a078aa43-03a6-4989-af75-73a485119efd" />
 
 ---
 
-## 📚 Documentation Guides
+## Teknologi
 
-### 🚀 [Deployment Guide](DEPLOYMENT.md)
-Complete deployment documentation for production environments:
-- Quick clone & setup instructions
-- Production server configuration (Apache/Nginx)
-- Environment templates & optimization
-- Security hardening & performance tuning
-- Troubleshooting common issues
-
-### 🎨 [Customization Guide](CUSTOMIZATION.md)
-Brand and customize SIBARANG for your organization:
-- Logo, colors, and organization details
-- Industry-specific configurations (Healthcare, Education, Corporate)
-- Custom fields and validation rules
-- Multi-language support setup
-- Advanced feature customization
+| Komponen | Versi |
+|----------|-------|
+| Laravel | 12.40.1 |
+| PHP | 8.3.23 |
+| Database | MySQL/SQLite |
+| Frontend | Tailwind CSS, Alpine.js, Chart.js |
+| Permission | Spatie Laravel Permission |
+| PDF | DomPDF |
 
 ---
 
-## 🚀 Installation & Deployment Guide
+## Panduan Instalasi
 
-### Prerequisites
+### Prasyarat
 
-Pastikan sudah terinstall:
+- PHP 8.2+
+- Composer 2.x
+- Node.js 18+ dan NPM
+- MySQL 8.0 atau MariaDB 10.6+
+- Git
 
-- **PHP 8.2+**
-- **Composer 2.x**
-- **Node.js 18+** & NPM
-- **MySQL 8.0** / MariaDB 10.6+
-- **Git**
-
-### Quick Start (Development)
-
-#### Step 1: Clone Repository
+### Langkah 1: Clone Repository
 ```bash
 git clone <repository-url>
 cd Inventaris-barang-ferdi
 ```
 
-#### Step 2: Install Dependencies
+### Langkah 2: Install Dependencies
 ```bash
 composer install
 npm install
 ```
 
-#### Step 3: Environment Setup
+### Langkah 3: Konfigurasi Environment
 ```bash
 cp .env.example .env
 php artisan key:generate
@@ -218,68 +182,49 @@ DB_USERNAME=root
 DB_PASSWORD=your_password
 ```
 
-#### Step 4: Database Setup
+### Langkah 4: Setup Database
 ```bash
-# Buat database
 mysql -u root -p -e "CREATE DATABASE sibarang_inventaris"
-
-# Production: Clean install with admin user only
 php artisan migrate:fresh --seed
-
-# Optional: Add demo data for testing
-php artisan db:seed --class="Database\Seeders\Demo\DemoSeeder"
 ```
 
-#### Step 5: Storage Setup
+### Langkah 5: Storage Link
 ```bash
 php artisan storage:link
 ```
 
-#### Step 6: Build Assets & Run
+### Langkah 6: Build dan Jalankan
 ```bash
-# Build frontend assets
 npm run build
-
-# Jalankan server
 php artisan serve
 ```
 
 **Akses:** http://127.0.0.1:8000
 
-### Default Login
-| Email | Password | Role | Security Setup |
-|-------|----------|------|----------------|
-| admin@inventaris.com | panelsibarang | Admin | Required (not completed) |
+### Login Default
+| Email | Password | Role |
+|-------|----------|------|
+| admin@inventaris.com | panelsibarang | Admin |
 
-> ⚠️ **Security Note:** First login requires completing security setup (birth date & security questions) for password reset functionality.
+> Login pertama memerlukan pengaturan keamanan (tanggal lahir dan pertanyaan keamanan).
 
 ---
 
-### Production Deployment
+## Konfigurasi Produksi
 
-#### 1. Build Assets
+### Build Assets
 ```bash
 npm run build
 ```
 
-#### 2. Environment Configuration
-Edit `.env`:
+### Konfigurasi Environment
 ```env
 APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://yourdomain.com
 ```
 
-#### 3. Database Setup (Production)
-```bash
-# Clean production install (admin user only)
-php artisan migrate:fresh --seed
-
-# For testing/demo environments only:
-php artisan db:seed --class="Database\Seeders\Demo\DemoSeeder"
-```
-
-#### 4. Laravel Optimization
+### Optimasi Laravel
 ```bash
 php artisan config:cache
 php artisan route:cache
@@ -287,32 +232,22 @@ php artisan view:cache
 php artisan optimize
 ```
 
-#### 5. PHP Settings (php.ini)
+### Pengaturan PHP (php.ini)
 ```ini
 upload_max_filesize = 10M
 post_max_size = 50M
 max_file_uploads = 20
 memory_limit = 256M
 max_execution_time = 300
-
-# Required Extensions
-extension=fileinfo
-extension=gd
-extension=mbstring
-extension=openssl
-extension=pdo_mysql
-extension=zip
 ```
 
-#### 6. File Permissions (Linux)
+### Permission File (Linux)
 ```bash
 chmod -R 775 storage bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache
 ```
 
-#### 7. Web Server Configuration
-
-**Apache (.htaccess already included)**
+### Konfigurasi Apache
 ```apache
 <VirtualHost *:80>
     DocumentRoot /path/to/sibarang/public
@@ -325,7 +260,7 @@ chown -R www-data:www-data storage bootstrap/cache
 </VirtualHost>
 ```
 
-**Nginx**
+### Konfigurasi Nginx
 ```nginx
 server {
     listen 80;
@@ -349,7 +284,7 @@ server {
 
 ---
 
-### LAN Hosting (Optional)
+## Hosting Jaringan Lokal
 
 Untuk akses dari perangkat lain di jaringan lokal:
 
@@ -357,7 +292,7 @@ Untuk akses dari perangkat lain di jaringan lokal:
 # Cari IP lokal (Windows)
 ipconfig
 
-# Jalankan server dengan host 0.0.0.0
+# Jalankan server
 php artisan serve --host=0.0.0.0 --port=8000
 
 # Buka firewall (PowerShell Admin)
@@ -368,67 +303,83 @@ Akses dari perangkat lain: `http://192.168.x.x:8000`
 
 ---
 
-### Troubleshooting
+## Pemecahan Masalah
 
-<details>
-<summary><strong>Common Issues & Solutions</strong></summary>
-
-**404 Error on Routes**
+### Error 404 pada Routes
 ```bash
 php artisan route:clear
 php artisan config:clear
 ```
 
-**Permission Issues (Linux)**
+### Masalah Permission (Linux)
 ```bash
 sudo chown -R $USER:www-data storage
 sudo chown -R $USER:www-data bootstrap/cache
 chmod -R 775 storage bootstrap/cache
 ```
 
-**Assets Not Loading**
+### Assets Tidak Termuat
 ```bash
 npm run build
 php artisan view:clear
 ```
 
-**Database Connection Error**
-- Check database credentials in `.env`
-- Ensure MySQL service is running
-- Test connection: `php artisan tinker` then `DB::connection()->getPdo()`
+### Error Koneksi Database
+- Periksa kredensial database di `.env`
+- Pastikan service MySQL berjalan
+- Test koneksi: `php artisan tinker` lalu `DB::connection()->getPdo()`
 
-</details>
+---
 
-## 📱 Browser Support
+## Dukungan Browser
 
 - Chrome 90+
 - Firefox 88+
 - Safari 14+
 - Edge 90+
 
-## 📝 Latest Updates
+---
 
-### v0.0.3-beta (Current) - 29 Nov 2025
+## Riwayat Versi
 
-**🎯 Major Highlights:**
-- ✅ **Security-First Database Structure** - Separated demo data from production migrations
-- ✅ **Clean Production Installation** - `migrate:fresh --seed` creates admin user only
-- ✅ **Optional Demo Data System** - Demo data moved to `/database/seeders/Demo/` folder
-- ✅ **Enhanced Development Badge** - Professional indicator dengan network info
-- ✅ **Added Screenshots Section** - Visual showcase of dashboard, detail barang, dan about pages
-- ✅ **Fixed Export PDF 404 errors** - Route precedence resolved
-- ✅ **Advanced Profile Photo Cropping** - Fixed circular crop area dengan keyboard shortcuts
-- ✅ **Fixed User Profile 404 errors** - Permission middleware resolved
-- ✅ **UI/UX Improvements** - Transfer thumbnails, terminology cleanup, smart currency display
+### v1.0.0 (29 Nov 2025)
 
-**🔒 Security Improvements:**
-- Production installs no longer include demo data by default
-- Admin credentials: `admin@inventaris.com / panelsibarang`
-- Security setup required on first login
-- Demo data accessible via separate command only
+**Pembaruan Utama:**
+- Perbaikan duplikasi pagination di 8 halaman
+- Standardisasi empty state dengan component konsisten
+- Mobile sidebar auto-close untuk navigasi lebih baik
+- Toast notification responsif dengan close button
+- Global keyboard shortcuts (Ctrl+K, Ctrl+N, ESC, Home)
+- Back-to-top button dengan smooth scrolling
+- Search input dengan tombol clear
+- Optimasi lebar kolom tabel untuk readability
+- Upgrade versi dari beta ke stable production
 
-**📋 Complete changelog:** [CHANGELOG.md](CHANGELOG.md)
+**Peningkatan UX:**
+- Konsistensi desain di seluruh aplikasi
+- Mobile responsiveness ditingkatkan
+- Keyboard navigation untuk power users
+- Accessibility improvements (ARIA labels)
+
+Changelog lengkap: [CHANGELOG.md](CHANGELOG.md)
+
+### v0.0.3-beta (29 Nov 2025)
+
+**Pembaruan Utama:**
+- Struktur database terpisah antara produksi dan demo
+- Instalasi produksi hanya membuat user admin
+- Sistem data demo opsional
+- Perbaikan export PDF 404
+- Fitur crop foto profil dengan keyboard shortcuts
+- Perbaikan error 404 profil pengguna
+- Peningkatan UI/UX secara keseluruhan
+
+**Peningkatan Keamanan:**
+- Instalasi produksi tidak menyertakan data demo
+- Pengaturan keamanan wajib pada login pertama
+
+Changelog lengkap: [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
-**Developed for Kabupaten Kubu Raya** 🏛️
+**Dikembangkan untuk Kabupaten Kubu Raya**

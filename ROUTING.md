@@ -1,6 +1,6 @@
 # 🛣️ SIBARANG - Routing Documentation
 
-**Version: v0.0.3-beta** | **Total Routes: 121** (94 Web + 27 API) | **Last Updated:** November 29, 2025
+**Version: v1.0.0** | **Total Routes: 121** (94 Web + 27 API) | **Last Updated:** November 29, 2025
 
 ---
 

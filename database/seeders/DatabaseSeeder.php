@@ -8,21 +8,30 @@ class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
-     * Only creates minimal admin user for fresh installation.
+     * Creates essential production data: admin, categories, locations, referral codes.
      * 
-     * For demo data, run: php artisan db:seed --class="Database\Seeders\Demo\DemoSeeder"
+     * For complete demo data, run: php artisan db:seed --class="Database\Seeders\Demo\DemoSeeder"
      */
     public function run(): void
     {
-        $this->command->info('🔧 Running minimal SIBARANG installation...');
+        $this->command->info('🔧 Running SIBARANG production installation...');
         
         $this->call([
-            UserSeeder::class,        // Create admin user only
+            UserSeeder::class,        // Create admin user
+            CategorySeeder::class,    // Create essential categories
+            LocationSeeder::class,    // Create essential locations  
+            ReferralCodeSeeder::class, // Create essential referral codes
         ]);
         
-        $this->command->info('✅ Minimal installation completed!');
+        $this->command->info('✅ Production installation completed!');
         $this->command->info('');
-        $this->command->info('📝 To add demo data, run:');
-        $this->command->info('   php artisan db:seed --class="Database\\Demo\\DemoSeeder"');
+        $this->command->info('📊 Created:');
+        $this->command->info('   - 1 Admin user');
+        $this->command->info('   - 5 Essential categories');
+        $this->command->info('   - 5 Essential locations');
+        $this->command->info('   - 3 Referral codes');
+        $this->command->info('');
+        $this->command->info('📝 To add complete demo data, run:');
+        $this->command->info('   php artisan db:seed --class="Database\\MigrationsDemo\\DemoSeeder"');
     }
 }

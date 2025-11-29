@@ -133,6 +133,6 @@ return [
     |
     */
 
-    'version' => '0.0.3-semi-stable',
+    'version' => '1.0.0',
 
 ];

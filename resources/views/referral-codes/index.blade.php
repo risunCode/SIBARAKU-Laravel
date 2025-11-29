@@ -39,13 +39,23 @@
 
     <!-- Filters -->
     <div class="rounded-lg border p-4 mb-6" style="background-color: var(--bg-card); border-color: var(--border-color);">
-        <form action="{{ route('referral-codes.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <x-form.input name="search" placeholder="Cari kode..." :value="request('search')" />
-            <x-form.select name="status" placeholder="Semua Status" :value="request('status')" :options="['active' => 'Aktif', 'inactive' => 'Nonaktif', 'expired' => 'Kadaluarsa']" />
-            <div class="flex gap-2">
-                <button type="submit" class="btn btn-primary flex-1">Filter</button>
-                <a href="{{ route('referral-codes.index') }}" class="btn btn-outline">Reset</a>
+        <form id="filterForm" action="{{ route('referral-codes.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-3 gap-4" data-no-warn>
+            <div class="relative">
+                <input type="text" name="search" id="searchInput" class="input w-full pl-10" placeholder="Cari kode..." value="{{ request('search') }}" oninput="debounceSearch()">
+                <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <div id="searchSpinner" class="hidden absolute right-3 top-1/2 -translate-y-1/2">
+                    <svg class="animate-spin h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </div>
             </div>
+            
+            <select name="status" class="input w-full" onchange="submitFilter()">
+                <option value="">Semua Status</option>
+                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
+                <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Nonaktif</option>
+                <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>Kadaluarsa</option>
+            </select>
+            
+            <a href="{{ route('referral-codes.index') }}" class="btn btn-outline">Reset</a>
         </form>
     </div>
 
@@ -138,15 +148,19 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="px-4 py-8 text-center" style="color: var(--text-secondary);">
-                            Belum ada kode referral. Klik tombol "Buat Kode Baru" untuk membuat.
+                        <td colspan="8">
+                            <x-empty-state 
+                                icon="document"
+                                title="Belum Ada Kode Referral"
+                                description="Buat kode referral untuk mengundang pengguna baru ke sistem"
+                            />
                         </td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-        @if($referralCodes->hasPages())
+        @if($referralCodes->hasPages() || $referralCodes->count() > 0)
         <div class="p-4 border-t" style="border-color: var(--border-color);">
             <x-pagination :paginator="$referralCodes" />
         </div>
@@ -479,6 +493,29 @@
             } catch (err) {
                 Swal.fire({ icon: 'error', title: 'Gagal!', text: 'Terjadi kesalahan' });
             }
+        }
+
+        function submitFilter() {
+            const form = document.getElementById('filterForm');
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+            
+            for (const [key, value] of formData.entries()) {
+                if (value) params.append(key, value);
+            }
+            
+            window.location.href = form.action + '?' + params.toString();
+        }
+
+        let searchTimeout;
+        function debounceSearch() {
+            const spinner = document.getElementById('searchSpinner');
+            if (spinner) spinner.classList.remove('hidden');
+            
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                submitFilter();
+            }, 500);
         }
 
         @if(session()->has('success') && session('success'))

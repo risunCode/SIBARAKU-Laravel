@@ -47,7 +47,7 @@ if (!function_exists('app_version')) {
      */
     function app_version(): string
     {
-        return config('sibarang.version', '0.0.3-semi-stable');
+        return config('sibarang.version', '1.0.0');
     }
 }
 

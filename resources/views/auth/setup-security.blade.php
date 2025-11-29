@@ -205,7 +205,7 @@
                 <div class="flex items-center gap-4">
                     <span>{{ config('app.name') }}</span>
                     <span class="text-gray-300">|</span>
-                    <span class="text-xs bg-gray-100 px-2 py-1 rounded">v{{ config('sibarang.version', '0.0.3-semi-stable') }}</span>
+                    <span class="text-xs bg-gray-100 px-2 py-1 rounded">v{{ config('sibarang.version', '1.0.0') }}</span>
                 </div>
             </div>
         </div>

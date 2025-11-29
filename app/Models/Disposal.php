@@ -15,18 +15,23 @@ class Disposal extends Model
         'commodity_id',
         'disposal_date',
         'reason',
+        'disposal_method',
         'description',
         'estimated_value',
+        'disposal_value',
         'notes',
         'requested_by',
         'approved_by',
         'status',
         'rejection_reason',
+        'attachments',
     ];
 
     protected $casts = [
         'disposal_date' => 'date',
         'estimated_value' => 'decimal:2',
+        'disposal_value' => 'decimal:2',
+        'attachments' => 'array',
     ];
 
     /**
@@ -156,6 +161,33 @@ class Disposal extends Model
     public function getFormattedValueAttribute(): string
     {
         return 'Rp ' . number_format($this->estimated_value ?? 0, 0, ',', '.');
+    }
+
+    /**
+     * Get disposal value format Rupiah.
+     */
+    public function getFormattedDisposalValueAttribute(): string
+    {
+        return 'Rp ' . number_format($this->disposal_value ?? 0, 0, ',', '.');
+    }
+
+    /**
+     * Get label metode disposal.
+     */
+    public function getDisposalMethodLabelAttribute(): ?string
+    {
+        if (!$this->disposal_method) {
+            return null;
+        }
+
+        return match ($this->disposal_method) {
+            'auction' => 'Lelang',
+            'donation' => 'Hibah',
+            'destruction' => 'Pemusnahan',
+            'sale' => 'Penjualan Langsung',
+            'recycle' => 'Daur Ulang',
+            default => $this->disposal_method,
+        };
     }
 
     /**

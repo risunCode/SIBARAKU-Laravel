@@ -22,6 +22,11 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register observers
         \App\Models\Commodity::observe(\App\Observers\CommodityObserver::class);
+        \App\Models\Transfer::observe(\App\Observers\TransferObserver::class);
+        \App\Models\Disposal::observe(\App\Observers\DisposalObserver::class);
+        \App\Models\Maintenance::observe(\App\Observers\MaintenanceObserver::class);
+        \App\Models\Category::observe(\App\Observers\CategoryObserver::class);
+        \App\Models\Location::observe(\App\Observers\LocationObserver::class);
         
         // Define role-based gates for permissions
         Gate::define('users.view', function ($user) {

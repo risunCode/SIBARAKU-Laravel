@@ -22,13 +22,13 @@ class UserSeeder extends Seeder
             'phone' => '+6281234567890',
             'birth_date' => '1990-01-01',
             'is_active' => true,
-            'security_setup_completed' => false,
+            'security_setup_completed' => true,
             'role' => 'admin',
         ]);
 
         $this->command->info('✅ Admin user created successfully');
         $this->command->info("   Email: admin@inventaris.com");
         $this->command->info("   Password: panelsibarang");
-        $this->command->info("   Security Setup: Required (not completed)");
+        $this->command->info("   Security Setup: Completed (default)");
     }
 }

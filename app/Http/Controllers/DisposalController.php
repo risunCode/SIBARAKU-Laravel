@@ -76,9 +76,12 @@ class DisposalController extends Controller implements HasMiddleware
         $validated = $request->validate([
             'commodity_id' => ['required', 'exists:commodities,id'],
             'reason' => ['required', 'in:rusak_berat,hilang,usang,dicuri,dijual,dihibahkan,lainnya'],
+            'disposal_method' => ['nullable', 'in:auction,donation,destruction,sale,recycle'],
             'description' => ['required', 'string'],
             'estimated_value' => ['nullable', 'numeric', 'min:0'],
+            'disposal_value' => ['nullable', 'numeric', 'min:0'],
             'notes' => ['nullable', 'string'],
+            'attachments.*' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
         ]);
 
         // Cek apakah barang sudah ada pengajuan pending
@@ -86,17 +89,32 @@ class DisposalController extends Controller implements HasMiddleware
             return back()->withErrors(['commodity_id' => 'Barang ini sudah memiliki pengajuan penghapusan yang belum diproses.']);
         }
 
+        // Handle file uploads
+        $attachmentPaths = [];
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $path = $file->store('disposal_attachments', 'public');
+                $attachmentPaths[] = [
+                    'path' => $path,
+                    'name' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                ];
+            }
+        }
+
         $disposal = Disposal::create([
             'commodity_id' => $validated['commodity_id'],
             'reason' => $validated['reason'],
+            'disposal_method' => $validated['disposal_method'] ?? null,
             'description' => $validated['description'],
             'estimated_value' => $validated['estimated_value'] ?? 0,
+            'disposal_value' => $validated['disposal_value'] ?? null,
             'notes' => $validated['notes'],
+            'attachments' => $attachmentPaths,
             'requested_by' => Auth::id(),
             'status' => 'pending',
+            'disposal_date' => now(),
         ]);
-
-        // Activity logged;
 
         // Send notification to admin users about disposal request
         $adminUsers = User::where('role', 'admin')->get();
@@ -138,8 +156,6 @@ class DisposalController extends Controller implements HasMiddleware
         // Soft delete barang
         $disposal->commodity->delete();
 
-        // Activity logged;
-
         return back()->with('success', 'Penghapusan berhasil disetujui. Barang telah dihapus dari inventaris.');
     }
 
@@ -162,8 +178,6 @@ class DisposalController extends Controller implements HasMiddleware
             'rejection_reason' => $request->rejection_reason,
         ]);
 
-        // Activity logged;
-
         return back()->with('success', 'Pengajuan penghapusan berhasil ditolak.');
     }
 
@@ -181,8 +195,6 @@ class DisposalController extends Controller implements HasMiddleware
         }
 
         $disposal->delete();
-
-        // Activity logged;
 
         return redirect()->route('disposals.index')
             ->with('success', 'Pengajuan berhasil dibatalkan.');

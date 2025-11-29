@@ -106,24 +106,11 @@
                                     </form>
                                     @endif
                                     
-                                    @if(isset($notification->data['actions']))
-                                        @foreach($notification->data['actions'] as $action)
-                                            @if(isset($action['method']) && $action['method'] === 'POST')
-                                            <form action="{{ $action['url'] }}" method="POST" class="inline">
-                                                @csrf
-                                                <button type="submit" class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium {{ $action['class'] ?? 'btn-primary' }}"
-                                                        onclick="return confirm('{{ $action['label'] === 'Tolak' ? 'Yakin tolak pengajuan ini?' : 'Yakin ' . strtolower($action['label']) . ' pengajuan ini?' }}')">
-                                                    <i class="{{ $action['icon'] ?? 'bx bx-link-external' }}"></i>
-                                                    {{ $action['label'] }}
-                                                </button>
-                                            </form>
-                                            @else
-                                            <a href="{{ $action['url'] }}" class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium {{ $action['class'] ?? 'btn-primary' }}">
-                                                <i class="{{ $action['icon'] ?? 'bx bx-link-external' }}"></i>
-                                                {{ $action['label'] }}
-                                            </a>
-                                            @endif
-                                        @endforeach
+                                    @if(isset($notification->data['action_url']))
+                                    <a href="{{ $notification->data['action_url'] }}" class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs btn-primary">
+                                        <i class="bx bx-show"></i>
+                                        Lihat Detail
+                                    </a>
                                     @elseif(isset($notification->data['url']))
                                     <a href="{{ $notification->data['url'] }}" class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs btn-primary">
                                         <i class="bx bx-show"></i>

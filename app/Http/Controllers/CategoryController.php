@@ -49,11 +49,31 @@ class CategoryController extends Controller implements HasMiddleware
             }
         }
 
-        $perPage = min($request->get('per_page', 15), 100); // Max 100 per page
-        $categories = $query->orderBy('name')->paginate($perPage)->withQueryString();
-        $parentCategories = Category::whereNull('parent_id')->orderBy('name')->get();
+        // Sorting
+        $sort = $request->get('sort', 'code');
+        $direction = $request->get('direction', 'asc');
 
-        return view('categories.index', compact('categories', 'parentCategories'));
+        switch ($sort) {
+            case 'commodities_count':
+                $query->orderBy('commodities_count', $direction);
+                break;
+            case 'parent_name':
+                $query->select('categories.*')
+                      ->leftJoin('categories as parent', 'categories.parent_id', '=', 'parent.id')
+                      ->withCount('commodities')
+                      ->orderBy('parent.name', $direction)
+                      ->orderBy('categories.name', 'asc');
+                break;
+            default:
+                $query->orderBy('code', $direction);
+        }
+
+        $perPage = min($request->get('per_page', 15), 100); // Max 100 per page
+        $categories = $query->paginate($perPage)->withQueryString();
+        $parentCategories = Category::whereNull('parent_id')->orderBy('name')->get();
+        $existingCodes = Category::whereNotNull('code')->distinct()->pluck('code')->sort();
+
+        return view('categories.index', compact('categories', 'parentCategories', 'existingCodes'));
     }
 
     /**
@@ -72,20 +92,98 @@ class CategoryController extends Controller implements HasMiddleware
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'code' => ['nullable', 'string', 'max:10', 'unique:categories,code'],
-            'parent_id' => ['nullable', 'exists:categories,id'],
+            'code' => ['required', 'string'],
+            'new_code' => ['nullable', 'string', 'max:10', 'unique:categories,code', 'required_if:code,new'],
+            'parent_id' => ['nullable', 'string'],
+            'new_parent_name' => ['nullable', 'string', 'max:255', 'required_if:parent_id,new'],
             'description' => ['nullable', 'string'],
-            'is_active' => ['boolean'],
+            'is_active' => ['nullable'],
         ]);
 
-        // Auto generate code if empty
-        if (empty($validated['code'])) {
-            $validated['code'] = strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $validated['name']), 0, 3)) . rand(100, 999);
+        // Handle code selection
+        if ($validated['code'] === 'new') {
+            $validated['code'] = $validated['new_code'];
         }
 
         $validated['is_active'] = $request->boolean('is_active', true);
 
-        $category = Category::create($validated);
+        // Handle new parent category creation
+        $category = null;
+        if ($validated['parent_id'] === 'new') {
+            // Check if parent category already exists before transaction
+            $existingParent = Category::where('name', $validated['new_parent_name'])
+                ->where('parent_id', null)
+                ->first();
+            
+            try {
+                // Use transaction to ensure both parent and child are created together
+                $category = DB::transaction(function () use ($validated, $existingParent) {
+                    if ($existingParent) {
+                        // Use existing parent category
+                        $parentCategory = $existingParent;
+                    } else {
+                        // Create new parent category first
+                        $parentData = [
+                            'name' => $validated['new_parent_name'],
+                            'code' => strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $validated['new_parent_name']), 0, 3)) . rand(100, 999),
+                            'parent_id' => null,
+                            'description' => 'Parent kategori otomatis dibuat',
+                            'is_active' => true,
+                        ];
+                        
+                        // Ensure parent code is unique
+                        while (Category::where('code', $parentData['code'])->exists()) {
+                            $parentData['code'] = strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $validated['new_parent_name']), 0, 3)) . rand(100, 999);
+                        }
+                        
+                        $parentCategory = Category::create($parentData);
+                    }
+                    
+                    // Ensure child code is unique (recheck in transaction)
+                    while (Category::where('code', $validated['code'])->exists()) {
+                        $validated['code'] = strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $validated['name']), 0, 3)) . rand(100, 999);
+                    }
+                    
+                    // Create child category with the parent ID
+                    $childData = [
+                        'name' => $validated['name'],
+                        'code' => $validated['code'],
+                        'parent_id' => $parentCategory->id,
+                        'description' => $validated['description'],
+                        'is_active' => $validated['is_active'],
+                    ];
+                    
+                    return Category::create($childData);
+                });
+                
+                $message = 'Kategori berhasil ditambahkan. ' . 
+                    ($existingParent ? 'Menggunakan parent kategori yang sudah ada.' : 'Parent kategori baru juga dibuat.');
+                
+            } catch (\Exception $e) {
+                if ($request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Gagal membuat kategori: ' . $e->getMessage()], 500);
+                }
+                return back()->withErrors(['error' => 'Gagal membuat kategori: ' . $e->getMessage()])->withInput();
+            }
+        } else {
+            // Normal category creation
+            try {
+                $validated['parent_id'] = $validated['parent_id'] ?: null;
+                
+                // Ensure code is unique
+                while (Category::where('code', $validated['code'])->exists()) {
+                    $validated['code'] = strtoupper(substr(preg_replace('/[^a-zA-Z0-9]/', '', $validated['name']), 0, 3)) . rand(100, 999);
+                }
+                
+                $category = Category::create($validated);
+                $message = 'Kategori berhasil ditambahkan.';
+            } catch (\Exception $e) {
+                if ($request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Gagal membuat kategori: ' . $e->getMessage()], 500);
+                }
+                return back()->withErrors(['error' => 'Gagal membuat kategori: ' . $e->getMessage()])->withInput();
+            }
+        }
 
         // Activity logged;
 
@@ -130,7 +228,7 @@ class CategoryController extends Controller implements HasMiddleware
             'code' => ['required', 'string', 'max:10', 'unique:categories,code,' . $category->id],
             'parent_id' => ['nullable', 'exists:categories,id'],
             'description' => ['nullable', 'string'],
-            'is_active' => ['boolean'],
+            'is_active' => ['nullable'],
         ]);
 
         // Jangan bisa jadikan diri sendiri sebagai parent
@@ -141,7 +239,8 @@ class CategoryController extends Controller implements HasMiddleware
             return back()->withErrors(['parent_id' => 'Kategori tidak bisa menjadi parent dirinya sendiri.']);
         }
 
-        $validated['is_active'] = $request->boolean('is_active', true);
+        // For update: unchecked checkbox means false (not default true like create)
+        $validated['is_active'] = $request->boolean('is_active');
 
         $oldValues = $category->toArray();
         $category->update($validated);
