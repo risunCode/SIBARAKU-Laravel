@@ -82,14 +82,6 @@ class Disposal extends Model
     }
 
     /**
-     * Images of disposal.
-     */
-    public function images(): HasMany
-    {
-        return $this->hasMany(DisposalImage::class);
-    }
-
-    /**
      * Signature of disposal.
      */
     public function signature(): HasOne

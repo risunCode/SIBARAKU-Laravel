@@ -3,7 +3,7 @@
 ![Laravel](https://img.shields.io/badge/Laravel-12.40.1-red?style=flat-square&logo=laravel)
 ![PHP](https://img.shields.io/badge/PHP-8.3-purple?style=flat-square&logo=php)
 ![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square)
-![Version](https://img.shields.io/badge/Version-1.1.2--public--hotfix-green?style=flat-square)
+![Version](https://img.shields.io/badge/Version-1.2.0--stable-green?style=flat-square)
 
 Sistem manajemen inventaris barang berbasis web untuk instansi pemerintah, BUMN/BUMD, dan perusahaan swasta. Dibangun dengan Laravel 12.
 

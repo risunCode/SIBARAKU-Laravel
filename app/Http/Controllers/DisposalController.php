@@ -130,7 +130,7 @@ class DisposalController extends Controller implements HasMiddleware
      */
     public function show(Disposal $disposal): View
     {
-        $disposal->load(['commodity.images', 'commodity.location', 'requestedBy', 'approvedBy', 'signature']);
+        $disposal->load(['commodity.images', 'commodity.location', 'requester', 'approver', 'signature']);
         return view('disposals.show', compact('disposal'));
     }
 

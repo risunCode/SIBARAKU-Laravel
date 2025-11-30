@@ -3,11 +3,11 @@
 
 ---
 
-## [v1.1.2-public-hotfix] - 2025-11-30 (Hotfix Release)
+## [v1.2.0-stable] - 2025-11-30 (Stable Release)
 
-### 🔧 Hotfix - Password Reset untuk Authenticated Users
+### 🔧 Critical Bug Fixes
 
-#### Critical Fixes
+#### Password Reset untuk Authenticated Users
 - **Password Reset Redirect Loop** - Fixed authenticated users being redirected to dashboard when accessing password reset
   - Moved password reset routes outside guest middleware group
   - Created standalone routes: `/reset-password`, `/reset-password/email`, `/reset-password/security`, `/reset-password/form/{token}`
@@ -18,10 +18,20 @@
   - Updated `auth/index.blade.php` and `auth/login.blade.php` to use `password.reset.auth` route
   - All "Lupa Password" links now work correctly for both guest and authenticated users
 
-#### Code Cleanup
-- Removed debug logging from `PasswordResetController` and `EnsureSecuritySetup` middleware
-- Simplified controller logic - removed complex auth checking branching
-- Updated all password reset views to use unified route names
+#### Disposal (Penghapusan) Module Fixes
+- **500 Error on Disposal Detail Page** - Fixed multiple issues:
+  - Removed undefined `images()` relationship referencing non-existent `DisposalImage` class
+  - Fixed relationship name mismatch: `requestedBy` → `requester`, `approvedBy` → `approver`
+  - Controller now correctly loads relationships in `DisposalController@show`
+
+### 🗄️ Database Updates
+- **New Table: `report_signatures`** - Digital signatures for PDF report verification
+  - Polymorphic relationship for disposal, maintenance, transfer
+  - Signature hash, content hash, IP address, user agent tracking
+  - Used for QR code verification feature
+- **Updated SQL Schema Files** - Both `sibaraku-full.sql` and `sibaraku-drawdb.sql` now include:
+  - `report_signatures` table definition
+  - Updated migrations list (21 tables total)
 
 ### 📸 Documentation
 - **README Screenshots Updated** - New gallery-style layout with 10 desktop screenshots
@@ -30,6 +40,12 @@
   - Inventaris Barang, Kategori, Lokasi
   - Profile page
   - About page (Light & Dark themes)
+
+### 🧹 Code Cleanup
+- Removed debug logging from `PasswordResetController` and `EnsureSecuritySetup` middleware
+- Simplified controller logic - removed complex auth checking branching
+- Updated all password reset views to use unified route names
+- Cleaned up unused imports in `Disposal` model
 
 ---
 

@@ -1,7 +1,7 @@
 -- ============================================================
 -- SIBARAKU - Sistem Inventaris Barang Kabupaten Kubu Raya
 -- Full Database Schema
--- Version: 1.1.2-public-hotfix
+-- Version: 1.2.0-stable
 -- Generated: November 30, 2025
 -- ============================================================
 -- 

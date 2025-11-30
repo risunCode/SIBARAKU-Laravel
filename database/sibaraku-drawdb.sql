@@ -1,6 +1,6 @@
 -- ============================================================
 -- SIBARAKU - Database Schema for DrawDB
--- Version: 1.1.2-public-hotfix
+-- Version: 1.2.0-stable
 -- ============================================================
 
 -- Table: users
