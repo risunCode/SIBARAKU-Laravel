@@ -50,6 +50,11 @@ class PasswordResetController extends Controller
         // Store email in session for next step (E-Surat-Perkim style)
         session(['reset_email' => $request->email]);
 
+        // Check if user is authenticated and redirect to appropriate route
+        if (auth()->check()) {
+            return redirect()->route('password.security.auth');
+        }
+
         return redirect()->route('password.security');
     }
 
@@ -61,7 +66,8 @@ class PasswordResetController extends Controller
         $email = session('reset_email');
         
         if (!$email) {
-            return redirect()->route('password.request')
+            $fallbackRoute = auth()->check() ? 'password.reset.auth' : 'password.request';
+            return redirect()->route($fallbackRoute)
                 ->withErrors(['email' => 'Sesi tidak valid. Silakan ulangi proses reset password.']);
         }
 
@@ -93,7 +99,8 @@ class PasswordResetController extends Controller
         $email = session('reset_email');
         
         if (!$email) {
-            return redirect()->route('password.request')
+            $fallbackRoute = auth()->check() ? 'password.reset.auth' : 'password.request';
+            return redirect()->route($fallbackRoute)
                 ->withErrors(['email' => 'Sesi tidak valid. Silakan ulangi proses reset password.']);
         }
 
@@ -136,6 +143,11 @@ class PasswordResetController extends Controller
             'expires_at' => now()->addMinutes(15),
         ]]);
 
+        // Check if user is authenticated and redirect to appropriate route
+        if (auth()->check()) {
+            return redirect()->route('password.reset.form.auth', $token);
+        }
+
         return redirect()->route('password.reset', $token);
     }
 
@@ -147,7 +159,8 @@ class PasswordResetController extends Controller
         $reset = session('password_reset');
 
         if (!$reset || $reset['token'] !== $token || !($reset['verified'] ?? false) || now()->isAfter($reset['expires_at'])) {
-            return redirect()->route('password.request')
+            $fallbackRoute = auth()->check() ? 'password.reset.auth' : 'password.request';
+            return redirect()->route($fallbackRoute)
                 ->withErrors(['email' => 'Sesi reset password tidak valid. Silakan ulangi.']);
         }
 

@@ -73,6 +73,17 @@ Route::middleware('auth')->group(function () {
 
     // Password Reset for Authenticated Users
     Route::get('reset-password', [PasswordResetController::class, 'create'])->name('password.reset.auth');
+    
+    // Rate Limited Auth Actions for Authenticated Users
+    Route::middleware('throttle:5,1')->group(function () {
+        Route::post('reset-password/email', [PasswordResetController::class, 'store'])->name('password.email.auth');
+        Route::post('reset-password/security', [PasswordResetController::class, 'verifySecurityQuestions'])->name('password.verify.auth');
+        Route::post('reset-password/update', [PasswordResetController::class, 'reset'])->name('password.update.auth');
+    });
+    
+    // Password Reset Forms for Authenticated Users
+    Route::get('reset-password/security', [PasswordResetController::class, 'showSecurityQuestions'])->name('password.security.auth');
+    Route::get('reset-password/form/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset.form.auth');
 
     // Notifications
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');

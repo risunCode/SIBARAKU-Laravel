@@ -4,7 +4,7 @@
         <p class="text-sm text-gray-500 mt-1">Masukkan password baru Anda</p>
     </div>
 
-    <form method="POST" action="{{ route('password.update') }}" class="space-y-4">
+    <form method="POST" action="{{ auth()->check() ? route('password.update.auth') : route('password.update') }}" class="space-y-4">
         @csrf
         <input type="hidden" name="token" value="{{ $token }}">
 
