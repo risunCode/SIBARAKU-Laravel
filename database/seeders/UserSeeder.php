@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Hash;
 class UserSeeder extends Seeder
 {
     /**
-     * Seed the users table with admin user.
+     * Seed the users table with default admin and staff users.
      */
     public function run(): void
     {
-        $this->command->info('👤 Creating admin user...');
+        $this->command->info('👤 Creating default users...');
 
         // Create admin user
         User::create([
@@ -25,8 +25,18 @@ class UserSeeder extends Seeder
             'security_setup_completed' => false,
         ]);
 
-        $this->command->info('✅ Admin user created');
-        $this->command->info('   Email: admin@inventaris.com');
-        $this->command->info('   Password: panelsibaraku');
+        // Create staff user
+        User::create([
+            'name' => 'Staff',
+            'email' => 'staff@inventaris.com',
+            'password' => Hash::make('panelsibaraku'),
+            'role' => 'staff',
+            'is_active' => true,
+            'security_setup_completed' => false,
+        ]);
+
+        $this->command->info('✅ Default users created');
+        $this->command->info('   Admin: admin@inventaris.com / panelsibaraku');
+        $this->command->info('   Staff: staff@inventaris.com / panelsibaraku');
     }
 }

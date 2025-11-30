@@ -19,19 +19,6 @@ class DemoSeeder extends Seeder
     {
         $this->command->info('🎭 Running SIBARAKU demo data installation...');
 
-        // Create demo staff user
-        $this->command->info('👤 Creating demo staff user...');
-        $staff = User::firstOrCreate(
-            ['email' => 'staff@demo.com'],
-            [
-                'name' => 'Staff Demo',
-                'password' => Hash::make('demodemo'),
-                'role' => 'staff',
-                'is_active' => true,
-                'security_setup_completed' => false,
-            ]
-        );
-
         // Create referral codes
         $this->command->info('🎟️ Creating referral codes...');
         $admin = User::where('role', 'admin')->first();
@@ -46,11 +33,6 @@ class DemoSeeder extends Seeder
                 ['code' => 'STAFF2025'],
                 ['created_by' => $admin->id, 'role' => 'staff', 'max_uses' => 10, 'is_active' => true]
             );
-
-            ReferralCode::firstOrCreate(
-                ['code' => 'DEMO2025'],
-                ['created_by' => $admin->id, 'role' => 'staff', 'max_uses' => 100, 'is_active' => true]
-            );
         }
 
         // Create demo commodities
@@ -58,7 +40,7 @@ class DemoSeeder extends Seeder
         
         $category = Category::first();
         $location = Location::first();
-        $user = $admin ?? $staff;
+        $user = $admin;
 
         if ($category && $location && $user) {
             $demoItems = [
@@ -92,8 +74,7 @@ class DemoSeeder extends Seeder
         $this->command->info('✅ Demo data installation completed!');
         $this->command->info('');
         $this->command->info('📊 Created:');
-        $this->command->info('   - 1 Demo staff user (staff@demo.com / demodemo)');
-        $this->command->info('   - 3 Referral codes (ADMIN2025, STAFF2025, DEMO2025)');
+        $this->command->info('   - 2 Referral codes (ADMIN2025, STAFF2025)');
         $this->command->info('   - 5 Demo commodities');
     }
 }

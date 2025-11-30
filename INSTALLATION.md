@@ -68,6 +68,10 @@ php artisan serve
 
 **Akses:** http://127.0.0.1:8000
 
+**Login:**
+- Admin: `admin@inventaris.com` / `panelsibaraku`
+- Staff: `staff@inventaris.com` / `panelsibaraku`
+
 ---
 
 ## Login Default
@@ -75,6 +79,7 @@ php artisan serve
 | Email | Password | Role |
 |-------|----------|------|
 | admin@inventaris.com | panelsibaraku | Admin |
+| staff@inventaris.com | panelsibaraku | Staff |
 
 > Login pertama memerlukan pengaturan keamanan (tanggal lahir dan pertanyaan keamanan).
 

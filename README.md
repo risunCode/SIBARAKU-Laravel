@@ -21,7 +21,9 @@ npm run build && php artisan serve
 ```
 
 **Akses:** http://localhost:8000  
-**Login:** `admin@inventaris.com` / `panelsibaraku`
+**Login:**
+- Admin: `admin@inventaris.com` / `panelsibaraku`
+- Staff: `staff@inventaris.com` / `panelsibaraku`
 
 > 📖 Panduan lengkap: [INSTALLATION.md](INSTALLATION.md)
 

@@ -120,7 +120,8 @@ npm run dev
 
 ### Akses
 - URL: http://localhost:8000 atau http://127.0.0.1:8000
-- Login: admin@inventaris.com / panelsibaraku
+- Login Admin: admin@inventaris.com / panelsibaraku
+- Login Staff: staff@inventaris.com / panelsibaraku
 - ⚠️ Wajib setup security questions saat login pertama
 
 ---

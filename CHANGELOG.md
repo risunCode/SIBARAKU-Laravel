@@ -556,8 +556,8 @@ php artisan db:seed --class=DemoSeeder
 - 18 Sample Commodities (laptop, printer, mobil, etc.)
 
 **Login Credentials:**
-- Email: `admin@inventaris.com`
-- Password: `panelsibaraku`
+- Admin: `admin@inventaris.com` / `panelsibaraku`
+- Staff: `staff@inventaris.com` / `panelsibaraku`
 - Security Setup: Required (not completed)
 
 ---
