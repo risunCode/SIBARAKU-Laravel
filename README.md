@@ -3,7 +3,7 @@
 ![Laravel](https://img.shields.io/badge/Laravel-12.40.1-red?style=flat-square&logo=laravel)
 ![PHP](https://img.shields.io/badge/PHP-8.3-purple?style=flat-square&logo=php)
 ![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat-square)
-![Version](https://img.shields.io/badge/Version-1.1.1--public-green?style=flat-square)
+![Version](https://img.shields.io/badge/Version-1.1.2--public--hotfix-green?style=flat-square)
 
 Sistem manajemen inventaris barang berbasis web untuk instansi pemerintah, BUMN/BUMD, dan perusahaan swasta. Dibangun dengan Laravel 12.
 
@@ -47,13 +47,24 @@ npm run build && php artisan serve
 
 ## 📸 Tangkapan Layar
 
-| Dashboard | Detail Barang |
-|-----------|---------------|
-| <img width="400" alt="Dashboard" src="https://github.com/user-attachments/assets/aa9c0f47-6dc0-4851-95fa-5d45c9869b03" /> | <img width="400" alt="Detail" src="https://github.com/user-attachments/assets/8bd6e9c0-1fe2-4bff-9e04-620d8c5b4319" /> |
+<details open>
+<summary><strong>🖥️ Desktop View</strong></summary>
+<br>
 
-| About | Dark Mode |
-|-------|-----------|
-| <img width="400" alt="About" src="https://github.com/user-attachments/assets/a6edcd66-32ee-4e1c-882f-9f03668aa37f" /> | <img width="400" alt="Dark Mode" src="https://github.com/user-attachments/assets/a078aa43-03a6-4989-af75-73a485119efd" /> |
+| | |
+|:---:|:---:|
+| ![Login Page](https://github.com/user-attachments/assets/98e34d62-83b5-45b2-b674-e768ae1a782f) | ![First Login](https://github.com/user-attachments/assets/d8a7482a-276e-4bfe-bc0a-b926dab7fd72) |
+| **Login Page** | **First Login Setup** |
+| ![Dashboard Light](https://github.com/user-attachments/assets/97593792-a5c1-45a4-a643-5fde40581f67) | ![Dashboard Dark](https://github.com/user-attachments/assets/3f7ecc14-9f20-4d2e-882f-363e19ec9fdf) |
+| **Dashboard (Light)** | **Dashboard (Dark)** |
+| ![Inventaris Barang](https://github.com/user-attachments/assets/767e9bcc-d776-49ab-9bc4-77508bb5edde) | ![Kategori](https://github.com/user-attachments/assets/702d83f7-08d7-498e-b571-82f61c3972e5) |
+| **Inventaris Barang** | **Kategori** |
+| ![Lokasi](https://github.com/user-attachments/assets/e80f6a22-744c-491f-b414-05a48d1bc51a) | ![Profile](https://github.com/user-attachments/assets/f183ef6f-291b-4fea-bf59-24d17babd9a3) |
+| **Lokasi** | **Profile** |
+| ![About Light](https://github.com/user-attachments/assets/cbda2859-0b2d-405f-87e5-a74d6046df82) | ![About Dark](https://github.com/user-attachments/assets/948dea1e-c464-4b79-81c1-70cdc19712f9) |
+| **About (Light)** | **About (Dark)** |
+
+</details>
 
 ---
 

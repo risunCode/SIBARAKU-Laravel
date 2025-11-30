@@ -1,6 +1,6 @@
 # 🚀 SIBARAKU - Panduan Deployment
 
-**Versi: v1.1.1-public**
+**Versi: v1.1.2-public-hotfix**
 
 Dokumen ini berisi instruksi terperinci tentang cara men-deploy SIBARAKU di berbagai lingkungan.
 

@@ -34,18 +34,22 @@ Route::middleware('guest')->group(function () {
     Route::middleware('throttle:5,1')->group(function () {
         Route::post('login', [AuthenticatedSessionController::class, 'store']);
         Route::post('register', [RegisterController::class, 'store'])->name('register');
-        Route::post('forgot-password', [PasswordResetController::class, 'store'])->name('password.email'); // Change to store
-        Route::post('security-questions', [PasswordResetController::class, 'verifySecurityQuestions'])->name('password.verify'); // No token
-        Route::post('reset-password', [PasswordResetController::class, 'reset'])->name('password.update');
     });
 
     // NOTE: Referral validation moved to /api/validate-referral (routes/api.php)
-
-    // Password Reset Forms (no rate limit needed for GET)
-    Route::get('forgot-password', [PasswordResetController::class, 'create'])->name('password.request');
-    Route::get('security-questions', [PasswordResetController::class, 'showSecurityQuestions'])->name('password.security'); // No token
-    Route::get('reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    // NOTE: Password reset routes moved outside guest middleware (see below)
 });
+
+// Password Reset Routes (No Middleware - Works for both Guest & Auth)
+Route::middleware('throttle:5,1')->group(function () {
+    Route::post('reset-password/email', [PasswordResetController::class, 'store'])->name('password.email.auth');
+    Route::post('reset-password/security', [PasswordResetController::class, 'verifySecurityQuestions'])->name('password.verify.auth');
+    Route::post('reset-password/update', [PasswordResetController::class, 'reset'])->name('password.update.auth');
+});
+
+Route::get('reset-password', [PasswordResetController::class, 'create'])->name('password.reset.auth');
+Route::get('reset-password/security', [PasswordResetController::class, 'showSecurityQuestions'])->name('password.security.auth');
+Route::get('reset-password/form/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset.form.auth');
 
 // Setup Security (WAJIB untuk semua user yang belum setup)
 Route::middleware('auth')->group(function () {
@@ -71,20 +75,7 @@ Route::middleware('auth')->group(function () {
     Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::put('profile/security', [ProfileController::class, 'updateSecurity'])->name('profile.security');
 
-    // Password Reset for Authenticated Users
-    Route::get('reset-password', [PasswordResetController::class, 'create'])->name('password.reset.auth');
     
-    // Rate Limited Auth Actions for Authenticated Users
-    Route::middleware('throttle:5,1')->group(function () {
-        Route::post('reset-password/email', [PasswordResetController::class, 'store'])->name('password.email.auth');
-        Route::post('reset-password/security', [PasswordResetController::class, 'verifySecurityQuestions'])->name('password.verify.auth');
-        Route::post('reset-password/update', [PasswordResetController::class, 'reset'])->name('password.update.auth');
-    });
-    
-    // Password Reset Forms for Authenticated Users
-    Route::get('reset-password/security', [PasswordResetController::class, 'showSecurityQuestions'])->name('password.security.auth');
-    Route::get('reset-password/form/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset.form.auth');
-
     // Notifications
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');

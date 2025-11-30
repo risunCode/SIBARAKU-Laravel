@@ -3,6 +3,36 @@
 
 ---
 
+## [v1.1.2-public-hotfix] - 2025-11-30 (Hotfix Release)
+
+### 🔧 Hotfix - Password Reset untuk Authenticated Users
+
+#### Critical Fixes
+- **Password Reset Redirect Loop** - Fixed authenticated users being redirected to dashboard when accessing password reset
+  - Moved password reset routes outside guest middleware group
+  - Created standalone routes: `/reset-password`, `/reset-password/email`, `/reset-password/security`, `/reset-password/form/{token}`
+  - Updated `EnsureSecuritySetup` middleware to use path-based exception checking
+  - Removed old password reset routes from guest middleware to prevent conflicts
+
+- **Route [password.request] Not Defined** - Fixed 500 error on auth page
+  - Updated `auth/index.blade.php` and `auth/login.blade.php` to use `password.reset.auth` route
+  - All "Lupa Password" links now work correctly for both guest and authenticated users
+
+#### Code Cleanup
+- Removed debug logging from `PasswordResetController` and `EnsureSecuritySetup` middleware
+- Simplified controller logic - removed complex auth checking branching
+- Updated all password reset views to use unified route names
+
+### 📸 Documentation
+- **README Screenshots Updated** - New gallery-style layout with 10 desktop screenshots
+  - Login page, First login setup
+  - Dashboard (Light & Dark themes)
+  - Inventaris Barang, Kategori, Lokasi
+  - Profile page
+  - About page (Light & Dark themes)
+
+---
+
 ## [v1.1.1-public] - 2025-11-30 (Public Release - Enhanced Stability)
 
 ### 🔒 Security & Bug Fixes

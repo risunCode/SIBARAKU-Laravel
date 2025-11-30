@@ -16,8 +16,19 @@ class EnsureSecuritySetup
     public function handle(Request $request, Closure $next): Response
     {
         if (auth()->check() && !auth()->user()->security_setup_completed) {
-            // Allow access to security setup and logout routes
-            if (!$request->routeIs('security.setup', 'security.store', 'logout')) {
+            // Allow access to security setup, logout, and password reset routes
+            $allowedPaths = ['security/setup', 'logout', 'reset-password'];
+            $currentPath = $request->path();
+            
+            $isAllowed = false;
+            foreach ($allowedPaths as $path) {
+                if (str_starts_with($currentPath, $path)) {
+                    $isAllowed = true;
+                    break;
+                }
+            }
+            
+            if (!$isAllowed) {
                 return redirect()->route('security.setup');
             }
         }

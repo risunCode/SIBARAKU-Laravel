@@ -39,7 +39,7 @@
                 <span class="text-sm text-gray-600">Ingat saya</span>
             </label>
 
-            <a href="{{ route('password.request') }}" class="text-sm text-primary-600 hover:underline">
+            <a href="{{ route('password.reset.auth') }}" class="text-sm text-primary-600 hover:underline">
                 Lupa password?
             </a>
         </div>

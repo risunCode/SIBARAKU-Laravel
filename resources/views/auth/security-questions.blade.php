@@ -38,7 +38,7 @@
         <p class="font-semibold text-gray-900">{{ $email }}</p>
     </div>
 
-    <form method="POST" action="{{ auth()->check() ? route('password.verify.auth') : route('password.verify') }}" class="space-y-4">
+    <form method="POST" action="{{ route('password.verify.auth') }}" class="space-y-4">
         @csrf
 
         <!-- Birth Date Input -->

@@ -4,7 +4,7 @@
         <p class="text-sm text-gray-500 mt-1">Masukkan email untuk reset password</p>
     </div>
 
-    <form method="POST" action="{{ auth()->check() ? route('password.email.auth') : route('password.email') }}" class="space-y-4">
+    <form method="POST" action="{{ route('password.email.auth') }}" class="space-y-4">
         @csrf
 
         <x-form.input 
