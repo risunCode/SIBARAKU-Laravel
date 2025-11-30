@@ -722,8 +722,8 @@ Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsR
 ### Quick Clone & Setup (5 Minutes)
 ```bash
 # 1. Clone Repository
-git clone https://github.com/risunCode/inventaris_barang_laravel.git your-inventory
-cd your-inventory
+git clone https://github.com/risunCode/SIBARAKU-Laravel.git sibaraku
+cd sibaraku
 
 # 2. Install Dependencies
 composer install

@@ -18,7 +18,7 @@
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/risunCode/inventaris_barang_laravel.git sibaraku
+git clone https://github.com/risunCode/SIBARAKU-Laravel.git sibaraku
 cd sibaraku
 ```
 

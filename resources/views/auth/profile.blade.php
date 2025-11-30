@@ -533,6 +533,7 @@ window.uploadCroppedImage = function() {
             fetch('{{ route("profile.update") }}', {
                 method: 'POST',
                 body: formData,
+                credentials: 'include',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json'

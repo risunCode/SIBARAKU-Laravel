@@ -28,8 +28,8 @@
 ### Initial Setup
 ```bash
 # 1. Clone repository
-git clone https://github.com/risunCode/inventaris_barang_laravel.git
-cd inventaris_barang_laravel
+git clone https://github.com/risunCode/SIBARAKU-Laravel.git
+cd SIBARAKU-Laravel
 
 # 2. Install dependencies
 composer install

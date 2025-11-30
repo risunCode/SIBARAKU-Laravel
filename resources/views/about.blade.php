@@ -15,7 +15,7 @@
                     </div>
                 </div>
                 <div class="hidden lg:flex justify-center">
-                    <img src="/images/logo-pbj-kalbar.png?v={{ time() }}" alt="Logo PBJ Kalbar" width="192" height="192" class="w-48 h-48 object-contain">
+                    <img src="/images/logo-pbj-kalbar.png" alt="Logo PBJ Kalbar" width="192" height="192" class="w-48 h-48 object-contain">
                 </div>
             </div>
         </div>

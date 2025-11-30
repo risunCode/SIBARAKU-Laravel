@@ -15,6 +15,9 @@
                 @csrf
                 @method('PUT')
                 <div class="card-body space-y-4">
+                    <!-- Hidden commodity_id for validation -->
+                    <input type="hidden" name="commodity_id" value="{{ $maintenance->commodity_id }}">
+                    
                     <!-- Commodity Info -->
                     <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
                         <img src="{{ $maintenance->commodity->primary_image_url }}" alt="" class="w-12 h-12 rounded-lg object-cover">

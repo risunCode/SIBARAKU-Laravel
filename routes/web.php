@@ -15,6 +15,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TransferController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReferralCodeController;
+use App\Http\Controllers\ReportVerificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -241,4 +242,55 @@ Route::middleware('auth')->group(function () {
 
     // About Page
     Route::get('about', fn() => view('about'))->name('about');
+    
+    // Session Status API (read-only check)
+    Route::get('/api/session/status', function (Illuminate\Http\Request $request) {
+        if (!auth()->check()) {
+            // Check if there was a previous session (has session cookie but no auth)
+            $hasSessionCookie = $request->hasCookie(config('session.cookie'));
+            $lastActivity = $request->session()->get('last_activity');
+            
+            if ($hasSessionCookie && $lastActivity) {
+                return response()->json(['status' => 'expired'], 401);
+            } else {
+                return response()->json(['status' => 'unauthenticated'], 401);
+            }
+        }
+        
+        $session = $request->session();
+        $lastActivity = $session->get('last_activity', time());
+        $lifetime = config('session.lifetime') * 60; // Convert minutes to seconds
+        $remaining = $lifetime - (time() - $lastActivity);
+        
+        // Don't update last_activity here - only extend on explicit action
+        
+        return response()->json([
+            'status' => 'active',
+            'remaining' => $remaining,
+            'expires_at' => $lastActivity + $lifetime
+        ]);
+    })->middleware('auth');
+    
+    // Session Extension API (explicitly extend session)
+    Route::post('/api/session/extend', function (Illuminate\Http\Request $request) {
+        if (!auth()->check()) {
+            return response()->json(['status' => 'expired'], 401);
+        }
+        
+        // Update last activity to extend session
+        $request->session()->put('last_activity', time());
+        
+        return response()->json([
+            'status' => 'extended',
+            'remaining' => config('session.lifetime') * 60,
+            'expires_at' => time() + (config('session.lifetime') * 60)
+        ]);
+    })->middleware('auth');
+});
+
+// Report Verification (Public access - no auth required)
+Route::prefix('verify')->group(function () {
+    Route::get('/', [ReportVerificationController::class, 'index'])->name('report.verification');
+    Route::post('/', [ReportVerificationController::class, 'check'])->name('report.check');
+    Route::get('/{hash}', [ReportVerificationController::class, 'verify'])->name('report.verify');
 });

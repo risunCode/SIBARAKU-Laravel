@@ -3,6 +3,113 @@
 
 ---
 
+## [v1.1.1-public] - 2025-11-30 (Public Release - Enhanced Stability)
+
+### 🔒 Security & Bug Fixes
+
+#### Critical Fixes
+- **CSRF 419 Error Prevention** - Fixed login → logout → login cycle causing "expired" error
+  - Added cache-control headers to auth pages (no-cache, no-store, must-revalidate)
+  - Implemented double-submit protection with JavaScript
+  - Added browser back-button detection with page reload
+  - Button disables + shows loading spinner after first click
+
+- **500 Server Error on Verification Pages** - Fixed verification URL returning 500
+  - Changed guest layout from `{{ $slot }}` to `@yield('content')`
+  - Added polymorphic morph map for 'disposal', 'maintenance', 'transfer'
+  - Added null-safe operators to verification result view
+
+- **Null Safety Fixes** - Prevented potential 500 errors from null relationships
+  - `referral-codes/index.blade.php` - `$code->creator?->name ?? '-'`
+  - `transfers/show.blade.php` - `$transfer->requester?->name ?? '-'`
+  - `disposals/show.blade.php` - `$disposal->requester?->name ?? '-'`
+
+#### Session Management Improvements
+- **Differentiated Authentication States** - Session status API now returns:
+  - `expired` - User had session but it timed out
+  - `unauthenticated` - User never logged in
+- **Smart SweetAlert Messages** - Different popups for expired vs new users
+- **Public Route Detection** - Session manager skips checks on `/verify`, `/auth`, `/`
+
+### 🎨 UI/UX Enhancements
+
+#### QR Verification Section Redesign
+- **Wide Grid Layout** - Changed from narrow card to responsive 3-column grid
+- **Theme Integration** - Removed hardcoded colors, uses theme-aware classes
+- **Dark Mode Support** - Proper contrast for verification ID, borders, and backgrounds
+- **Compact Spacing** - Optimized padding and margins for better visual balance
+- **Button Visibility** - Fixed copy and verification buttons not visible in dark mode
+
+#### Verification Result Page
+- **Full-Width Layout** - `max-w-7xl` container with proper grid structure
+- **No Theme Colors** - Clean gray borders and standard backgrounds only
+- **Responsive Design** - Collapses to single column on mobile
+- **Enhanced Readability** - Better font sizes and information hierarchy
+
+### 📋 Code Quality
+
+#### Security Audit Completed
+- **False Positives Removed** - XSS and authorization issues were already secure
+- **Authorization Verified** - All controllers use proper permission middleware
+- **Error Handling Verified** - Controllers have proper validation and checks
+- **Mass Assignment Verified** - Models have `$fillable` defined
+
+#### Cleanup 
+- **Cleared View Cache** - Ensured fresh compiled views
+
+### 📝 Documentation
+
+#### New .env.example Template
+- **Comprehensive Comments** - Clear indicators for each environment mode
+- **Environment Modes Table** - [LOCAL], [NGROK], [CLOUDFLARE], [PRODUCTION]
+- **Quick Setup Commands** - Copy-paste ready installation instructions
+- **Security Notes** - Warnings for sensitive configuration values
+
+### 🛠️ Technical Details
+
+#### Files Modified
+- `app/Http/Controllers/Auth/AuthenticatedSessionController.php` - Cache headers, Response type
+- `app/Providers/AppServiceProvider.php` - Polymorphic morph map
+- `resources/views/layouts/guest.blade.php` - @yield('content') fix
+- `resources/views/verification/result.blade.php` - Wide grid layout
+- `resources/views/maintenance/show.blade.php` - Theme-aware QR section
+- `resources/views/disposals/show.blade.php` - Theme-aware QR section
+- `resources/views/transfers/show.blade.php` - Theme-aware QR section
+- `resources/views/auth/index.blade.php` - Double-submit protection
+- `resources/js/session-manager.js` - Public route detection, auth differentiation
+- `routes/web.php` - Session status API differentiation
+- `config/app.php` - Version 1.1.1-public
+ 
+
+### 🚀 Upgrade Instructions
+
+```bash
+# Pull latest changes
+git pull origin main
+
+# Clear caches
+php artisan view:clear
+php artisan config:clear
+php artisan cache:clear
+
+# Rebuild assets
+npm run build
+
+# Fresh database (if needed)
+php artisan migrate:fresh --seed
+```
+
+### ✅ v1.1.1-public Stability Checklist
+- ✅ CSRF protection verified and enhanced
+- ✅ Verification pages working without 500 errors
+- ✅ Dark mode fully supported in QR sections
+- ✅ Null safety across all relationship accesses
+- ✅ Session management properly differentiated
+- ✅ .env.example with comprehensive documentation
+- ✅ Security audit completed - no critical issues
+
+---
+
 ## [v1.0.0] - 2025-11-29 (Stable Release - Production Ready)
 
 ### 🎨 Comprehensive UI/UX Enhancement Implementation
@@ -142,7 +249,7 @@
   - `/database/seeders/` - Essential production data (admin + categories + locations + referral codes)
   - `/database/seeders/Demo/` - Complete demo data (additional categories, locations, 18 commodities)
 - **Essential Production Data**:
-  - 1 Admin user (admin@inventaris.com / panelsibarang)
+  - 1 Admin user (admin@inventaris.com / panelsibaraku)
   - 5 Essential categories: ATK, ELK, KMP, TIK, KBM
   - 5 Essential locations: GU, GB, RS, RD, RM
   - 3 Referral codes: ADMIN2025, STAFF2025, DEMO2025
@@ -154,7 +261,7 @@
 - **Two-Step Installation Process**:
   - Production: `php artisan migrate:fresh --seed`
   - Demo Data: `php artisan db:seed --class="Database\Seeders\Demo\DemoSeeder"`
-- **Updated Admin Credentials**: `admin@inventaris.com / panelsibarang`
+- **Updated Admin Credentials**: `admin@inventaris.com / panelsibaraku`
 - **Security Setup Required** on first login (birth date & security questions)
 - **Enhanced Documentation** with clear production vs demo instructions
 
@@ -431,7 +538,7 @@ Routes reorganized with prefix grouping for better organization:
 
 #### Clean Production Install
 ```bash
-git clone https://github.com/risunCode/inventaris_barang_laravel.git your-inventory
+git clone https://github.com/risunCode/SIBARAKU-Laravel.git sibaraku
 cd your-inventory && composer install && npm install
 cp .env.example .env && php artisan key:generate
 php artisan migrate:fresh --seed
@@ -440,7 +547,7 @@ npm run build && php artisan serve
 
 #### Add Demo Data (Optional)
 ```bash
-php artisan db:seed --class="Database\Seeders\Demo\DemoSeeder"
+php artisan db:seed --class=DemoSeeder
 ```
 
 **Demo Data Includes:**
@@ -450,7 +557,7 @@ php artisan db:seed --class="Database\Seeders\Demo\DemoSeeder"
 
 **Login Credentials:**
 - Email: `admin@inventaris.com`
-- Password: `panelsibarang`
+- Password: `panelsibaraku`
 - Security Setup: Required (not completed)
 
 ---

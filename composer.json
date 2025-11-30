@@ -5,7 +5,7 @@
     "description": "SIBARAKU - Sistem Inventaris Barang Kabupaten Kubu Raya",
     "keywords": ["laravel", "inventory", "sibaraku", "kubu-raya"],
     "license": "GPL-3.0-or-later",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",
@@ -28,8 +28,7 @@
         "psr-4": {
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/",
-            "Database\\MigrationsDemo\\": "database/migrations-demo/"
+            "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
             "app/Helpers/sibarang.php"

@@ -112,8 +112,9 @@
                     </div>
                     @endif
 
-                    <form method="POST" action="{{ route('login') }}" class="space-y-4">
+                    <form method="POST" action="{{ route('login') }}" class="space-y-4" id="loginForm" onsubmit="return handleLoginSubmit(this)">
                         @csrf
+                        <input type="hidden" name="_token_timestamp" value="{{ time() }}">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                             <input type="email" name="email" value="{{ old('email') }}" required autofocus
@@ -161,7 +162,7 @@
                             <a href="{{ route('password.request') }}" class="text-sm text-primary-600 hover:underline">Lupa password?</a>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-full">Masuk</button>
+                        <button type="submit" id="loginBtn" class="btn btn-primary w-full">Masuk</button>
                     </form>
 
                     <p class="text-center text-sm text-gray-500 mt-6">
@@ -454,6 +455,41 @@
                     console.log('Error message:', '{{ session('error') }}');
                 @endif
             @endif
+        });
+
+        // Prevent double-submit on login form
+        let loginSubmitted = false;
+        function handleLoginSubmit(form) {
+            if (loginSubmitted) {
+                console.log('Login already submitted, preventing double-submit');
+                return false;
+            }
+            
+            loginSubmitted = true;
+            const btn = document.getElementById('loginBtn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...';
+            }
+            
+            // Re-enable after 5 seconds in case of network issues
+            setTimeout(() => {
+                loginSubmitted = false;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Masuk';
+                }
+            }, 5000);
+            
+            return true;
+        }
+
+        // Reset form state when page is shown (back button handling)
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                // Page was restored from bfcache (back button)
+                window.location.reload();
+            }
         });
     </script>
 </body>

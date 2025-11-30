@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust all proxies (ngrok, cloudflare, etc.)
+        $middleware->trustProxies(at: '*');
+        
         $middleware->alias([
             'permission' => PermissionMiddleware::class,
             'multi-permission' => MultiPermissionMiddleware::class,

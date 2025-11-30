@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Disposal;
+use App\Models\Maintenance;
+use App\Models\Transfer;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -20,6 +24,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Define polymorphic morph map for report signatures
+        Relation::morphMap([
+            'disposal' => Disposal::class,
+            'maintenance' => Maintenance::class,
+            'transfer' => Transfer::class,
+        ]);
+
         // Register observers
         \App\Models\Commodity::observe(\App\Observers\CommodityObserver::class);
         \App\Models\Transfer::observe(\App\Observers\TransferObserver::class);

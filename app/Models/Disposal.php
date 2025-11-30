@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Disposal extends Model
 {
@@ -78,6 +79,22 @@ class Disposal extends Model
     public function commodity(): BelongsTo
     {
         return $this->belongsTo(Commodity::class);
+    }
+
+    /**
+     * Images of disposal.
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(DisposalImage::class);
+    }
+
+    /**
+     * Signature of disposal.
+     */
+    public function signature(): HasOne
+    {
+        return $this->hasOne(ReportSignature::class, 'signable_id')->where('signable_type', 'disposal');
     }
 
     /**

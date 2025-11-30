@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Transfer extends Model
 {
@@ -104,6 +105,14 @@ class Transfer extends Model
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * Tanda tangan.
+     */
+    public function signature(): HasOne
+    {
+        return $this->hasOne(ReportSignature::class, 'signable_id')->where('signable_type', 'transfer');
     }
 
     /**

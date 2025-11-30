@@ -344,7 +344,7 @@
         }
 
         function openEditModal(user) {
-            document.getElementById('editForm').action = `/master/pengguna/${user.id}`;
+            document.getElementById('editForm').action = `/admin/pengguna/${user.id}`;
             document.getElementById('editName').value = user.name || '';
             document.getElementById('editEmail').value = user.email || '';
             document.getElementById('editPhone').value = user.phone || '';
@@ -369,7 +369,7 @@
             if (result.isConfirmed) {
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = `/master/pengguna/${id}`;
+                form.action = `/admin/pengguna/${id}`;
                 form.innerHTML = `
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="_method" value="DELETE">

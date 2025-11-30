@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\Commodity;
 use App\Models\Maintenance;
+use App\Models\ReportSignature;
 use App\Models\User;
 use App\Notifications\MaintenanceScheduled;
 use Illuminate\Http\RedirectResponse;
@@ -106,6 +107,31 @@ class MaintenanceController extends Controller implements HasMiddleware
             $maintenanceLog->commodity->update(['condition' => $validated['condition_after']]);
         }
 
+        // Generate digital signature for verification
+        $content = $maintenanceLog->commodity_id . '|' . $maintenanceLog->maintenance_date . '|' . $maintenanceLog->maintenance_type . '|' . $maintenanceLog->cost;
+        $signatureHash = ReportSignature::generateSignature($content, 'maintenance', $maintenanceLog->id, Auth::id());
+        $contentHash = ReportSignature::generateContentHash($content);
+        
+        ReportSignature::create([
+            'signable_type' => 'maintenance',
+            'signable_id' => $maintenanceLog->id,
+            'user_id' => Auth::id(),
+            'signature_hash' => $signatureHash,
+            'content_hash' => $contentHash,
+            'signed_at' => now(),
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'metadata' => [
+                'report_type' => 'maintenance',
+                'commodity_name' => $maintenanceLog->commodity->name ?? 'Unknown',
+                'maintenance_date' => $maintenanceLog->maintenance_date,
+                'maintenance_type' => $maintenanceLog->maintenance_type,
+                'cost' => $maintenanceLog->cost,
+                'created_by' => Auth::user()->name,
+            ],
+            'is_valid' => true,
+        ]);
+
         // Send notification to admin users about maintenance
         $adminUsers = User::where('role', 'admin')->get();
         Notification::send($adminUsers, new MaintenanceScheduled($maintenanceLog, Auth::user()));
@@ -119,7 +145,7 @@ class MaintenanceController extends Controller implements HasMiddleware
      */
     public function show(Maintenance $maintenance): View
     {
-        $maintenance->load(['commodity.images', 'creator']);
+        $maintenance->load(['commodity.images', 'creator', 'signature']);
         return view('maintenance.show', compact('maintenance'));
     }
 

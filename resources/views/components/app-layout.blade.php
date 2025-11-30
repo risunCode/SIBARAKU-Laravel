@@ -12,9 +12,7 @@
             }
         })();
     </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+        @include('components.meta-tags')
     <title>{{ $title ? $title . ' - ' : '' }}{{ config('app.name') }}</title>
     
     <!-- App Icon & Favicon -->
@@ -48,7 +46,7 @@
             <!-- Logo -->
             <div class="flex items-center justify-between h-16 px-4 border-b border-white/10">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
-                    <img src="/images/logo-pbj-kalbar.png?v={{ time() }}" alt="Logo" width="24" height="24" class="w-6 h-6 object-contain">
+                    <img src="/images/logo-pbj-kalbar.png" alt="Logo" width="24" height="24" class="w-6 h-6 object-contain">
                     <div>
                         <span class="font-bold text-white text-lg">SIBARAKU</span>
                         <p class="text-[10px] text-white/60 -mt-1">Menu Aplikasi</p>
@@ -265,11 +263,7 @@
                         </div>
                     </div>
                     @else
-                    <!-- Production IP Display (Desktop Only) -->
-                    <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg mr-2" style="background-color: var(--bg-input); border: 1px solid var(--border-color);">
-                        <svg class="w-4 h-4" style="color: var(--text-secondary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
-                        <span class="text-xs font-mono" style="color: var(--text-primary);" title="IP Address Anda">{{ request()->ip() }}</span>
-                    </div>
+                    <!-- Production: Hide IP display for security -->
                     @endif
 
                     <!-- Theme Dropdown -->
@@ -381,11 +375,7 @@
                                         </div>
                                     </div>
                                     @else
-                                    <!-- IP for Mobile - Production Only -->
-                                    <div class="lg:hidden flex items-center gap-1 px-2 py-0.5 rounded text-xs mt-2 w-fit" style="background-color: var(--bg-input); color: var(--text-secondary);" title="IP Address Anda">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
-                                        <span class="font-mono">{{ request()->ip() }}</span>
-                                    </div>
+                                    <!-- Production: Hide IP display for security -->
                                     @endif
                                 </div>
                             </div>
@@ -394,13 +384,10 @@
                                 Pengaturan Profil
                             </a>
                             <div class="border-t my-1" style="border-color: var(--border-color);"></div>
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="flex items-center gap-2 w-full px-4 py-2 text-sm hover:opacity-80 text-red-600">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                                    Keluar
-                                </button>
-                            </form>
+                            <button type="button" class="logout-button flex items-center gap-2 w-full px-4 py-2 text-sm hover:opacity-80 text-red-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                Keluar
+                            </button>
                         </div>
                     </div>
                 </div>

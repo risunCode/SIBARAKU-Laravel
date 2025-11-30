@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\Commodity;
 use App\Models\Disposal;
+use App\Models\ReportSignature;
 use App\Models\User;
 use App\Notifications\DisposalRequested;
 use Illuminate\Http\RedirectResponse;
@@ -129,7 +130,7 @@ class DisposalController extends Controller implements HasMiddleware
      */
     public function show(Disposal $disposal): View
     {
-        $disposal->load(['commodity.images', 'commodity.location', 'requester', 'approver']);
+        $disposal->load(['commodity.images', 'commodity.location', 'requestedBy', 'approvedBy', 'signature']);
         return view('disposals.show', compact('disposal'));
     }
 
@@ -153,10 +154,35 @@ class DisposalController extends Controller implements HasMiddleware
             'disposal_date' => now(),
         ]);
 
+        // Generate digital signature for verification
+        $content = $disposal->commodity_id . '|' . $disposal->reason . '|' . $disposal->status . '|' . $disposal->disposal_date;
+        $signatureHash = ReportSignature::generateSignature($content, 'disposal', $disposal->id, Auth::id());
+        $contentHash = ReportSignature::generateContentHash($content);
+        
+        ReportSignature::create([
+            'signable_type' => 'disposal',
+            'signable_id' => $disposal->id,
+            'user_id' => Auth::id(),
+            'signature_hash' => $signatureHash,
+            'content_hash' => $contentHash,
+            'signed_at' => now(),
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'metadata' => [
+                'report_type' => 'disposal',
+                'commodity_name' => $disposal->commodity->name ?? 'Unknown',
+                'reason' => $disposal->reason,
+                'disposal_date' => $disposal->disposal_date,
+                'approved_by' => Auth::user()->name,
+            ],
+            'is_valid' => true,
+        ]);
+
         // Soft delete barang
         $disposal->commodity->delete();
 
-        return back()->with('success', 'Penghapusan berhasil disetujui. Barang telah dihapus dari inventaris.');
+        return redirect()->route('disposals.index')
+            ->with('success', 'Penghapusan berhasil disetujui. Barang telah dihapus dari inventaris.');
     }
 
     /**

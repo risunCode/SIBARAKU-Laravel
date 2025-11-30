@@ -1,6 +1,6 @@
-# 🚀 SIBARAKU - Deployment Guide
+# 🚀 SIBARAKU - Panduan Deployment
 
-**Versi: v1.0.0-public**
+**Versi: v1.1.1-public**
 
 Dokumen ini berisi instruksi terperinci tentang cara men-deploy SIBARAKU di berbagai lingkungan.
 
@@ -8,15 +8,43 @@ Dokumen ini berisi instruksi terperinci tentang cara men-deploy SIBARAKU di berb
 
 ## 📋 Daftar Isi
 
+- [Mode Environment](#-mode-environment)
 - [Persiapan Awal](#persiapan-awal)
 - [Deployment Lokal](#deployment-lokal)
-- [Deployment dengan ngrok (Temporary URL)](#deployment-dengan-ngrok)
+- [Deployment dengan ngrok](#deployment-dengan-ngrok)
+- [Deployment dengan Cloudflare Tunnel](#deployment-dengan-cloudflare-tunnel)
 - [Shared Hosting](#shared-hosting)
 - [VPS/Dedicated Server](#vpsdedicated-server)
 - [Docker](#docker)
 - [Konfigurasi Tambahan](#konfigurasi-tambahan)
 - [Checklist Deployment](#checklist-deployment)
 - [Pemecahan Masalah](#pemecahan-masalah)
+
+---
+
+## 🎯 Mode Environment
+
+SIBARAKU mendukung 4 mode environment. Lihat `.env.example` untuk konfigurasi lengkap.
+
+```
+┌─────────────────┬────────────────────────────────────────────────────────┐
+│ MODE            │ DESKRIPSI                                              │
+├─────────────────┼────────────────────────────────────────────────────────┤
+│ [LOCAL]         │ Development di localhost:8000                          │
+│ [NGROK]         │ Testing via ngrok tunnel (URL publik sementara)        │
+│ [CLOUDFLARE]    │ Testing via Cloudflare Tunnel (gratis & stabil)        │
+│ [PRODUCTION]    │ Deployment produksi (server asli)                      │
+└─────────────────┴────────────────────────────────────────────────────────┘
+```
+
+### Perbedaan Konfigurasi Utama
+
+| Setting | [LOCAL] | [NGROK] | [CLOUDFLARE] | [PRODUCTION] |
+|---------|---------|---------|--------------|--------------|
+| `APP_ENV` | local | local | local | production |
+| `APP_DEBUG` | true | false | false | **false** |
+| `APP_URL` | http://localhost:8000 | https://xxx.ngrok-free.dev | https://xxx.trycloudflare.com | https://domain.com |
+| `LOG_LEVEL` | debug | info | info | warning |
 
 ---
 
@@ -33,7 +61,7 @@ Dokumen ini berisi instruksi terperinci tentang cara men-deploy SIBARAKU di berb
 ### Langkah-langkah Umum
 1. Clone repositori:
    ```bash
-   git clone https://github.com/risunCode/inventaris_barang_laravel.git sibaraku
+   git clone https://github.com/risunCode/SIBARAKU-Laravel.git sibaraku
    cd sibaraku
    ```
 
@@ -93,6 +121,7 @@ npm run dev
 ### Akses
 - URL: http://localhost:8000 atau http://127.0.0.1:8000
 - Login: admin@inventaris.com / panelsibaraku
+- ⚠️ Wajib setup security questions saat login pertama
 
 ---
 
@@ -183,6 +212,91 @@ ngrok TIDAK DIREKOMENDASIKAN untuk penggunaan produksi, hanya untuk:
 - Demo
 - Pengujian
 - Berbagi prototype
+
+---
+
+## Deployment dengan Cloudflare Tunnel
+
+### Apa itu Cloudflare Tunnel?
+Cloudflare Tunnel (sebelumnya Argo Tunnel) adalah layanan **GRATIS** dari Cloudflare yang memungkinkan Anda mengekspos server lokal ke internet dengan URL publik. Lebih stabil dan aman dibanding ngrok.
+
+### Kelebihan Cloudflare Tunnel
+- ✅ **Gratis** tanpa batasan bandwidth
+- ✅ **URL stabil** (tidak berubah setiap restart)
+- ✅ **HTTPS otomatis** dengan sertifikat Cloudflare
+- ✅ **Keamanan tinggi** dengan DDoS protection
+- ✅ **Tidak perlu registrasi** untuk quick tunnel
+
+### Persiapan
+
+#### 1. Install cloudflared
+```bash
+# Windows (via Chocolatey)
+choco install cloudflared
+
+# Windows (via Winget)
+winget install --id Cloudflare.cloudflared
+
+# macOS (via Homebrew)
+brew install cloudflared
+
+# Linux (Debian/Ubuntu)
+curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+sudo dpkg -i cloudflared.deb
+
+# Manual: Download dari https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation/
+```
+
+### Quick Tunnel (Tanpa Akun - Paling Mudah)
+
+#### 1. Jalankan Server Laravel
+```bash
+php artisan serve --host=0.0.0.0 --port=8000
+```
+
+#### 2. Di Terminal Terpisah, Jalankan Cloudflare Tunnel
+```bash
+cloudflared tunnel --url http://localhost:8000
+```
+
+#### 3. Perhatikan URL yang Diberikan
+```
+INF +--------------------------------------------------------------------------------------------+
+INF |  Your quick Tunnel has been created! Visit it at (it may take some time to be reachable): |
+INF |  https://random-words-here.trycloudflare.com                                               |
+INF +--------------------------------------------------------------------------------------------+
+```
+
+#### 4. Update File `.env`
+```env
+# [CLOUDFLARE] Mode
+APP_ENV=local
+APP_DEBUG=false
+APP_URL=https://random-words-here.trycloudflare.com
+ASSET_URL=https://random-words-here.trycloudflare.com
+```
+
+#### 5. Clear Cache
+```bash
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+```
+
+### Tunnel Permanen (Dengan Akun Cloudflare)
+
+Untuk URL yang tidak berubah:
+
+1. Login ke Cloudflare Zero Trust Dashboard
+2. Buat tunnel baru di Access > Tunnels
+3. Install connector dan konfigurasi
+4. Dapatkan subdomain permanen seperti `sibaraku.yourdomain.com`
+
+### Tips Cloudflare Tunnel
+- **Quick tunnel** cocok untuk demo dan testing cepat
+- **Named tunnel** cocok untuk environment staging
+- URL quick tunnel berubah setiap restart, tapi lebih stabil dari ngrok
+- Tidak ada batasan koneksi atau bandwidth
 
 ---
 
@@ -368,7 +482,7 @@ Tambahkan ke crontab:
 
 Jika mengalami masalah dengan deployment, hubungi tim support:
 - Email: support@sibaraku.example.com
-- Issues: [GitHub Issues](https://github.com/risunCode/inventaris_barang_laravel/issues)
+- Issues: [GitHub Issues](https://github.com/risunCode/SIBARAKU-Laravel/issues)
 
 ---
 

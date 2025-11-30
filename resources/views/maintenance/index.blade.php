@@ -134,14 +134,21 @@
                 <div class="space-y-4">
                     <x-form.input label="Biaya (Rp)" name="cost" type="number" min="0" placeholder="0" />
 
-                    <x-form.input label="Penanggung Jawab" name="technician" placeholder="Nama teknisi/penanggung jawab" />
+                    <x-form.input label="Dilakukan Oleh" name="performed_by" placeholder="Nama teknisi/penanggung jawab" />
 
-                    <x-form.input label="Tanggal Maintenance Berikutnya" name="next_maintenance" type="date" />
+                    <x-form.input label="Tanggal Maintenance Berikutnya" name="next_maintenance_date" type="date" />
                 </div>
 
                 <!-- Right Column -->
                 <div class="space-y-4">
                     <x-form.textarea label="Keterangan Maintenance" name="description" rows="4" placeholder="Jelaskan detail pekerjaan maintenance yang dilakukan..." />
+
+                    <x-form.select label="Kondisi Setelah" name="condition_after">
+                        <option value="">-- Pilih Kondisi --</option>
+                        <option value="baik">Baik</option>
+                        <option value="rusak_ringan">Rusak Ringan</option>
+                        <option value="rusak_berat">Rusak Berat</option>
+                    </x-form.select>
 
                     <x-form.textarea label="Catatan Tambahan" name="notes" rows="4" placeholder="Catatan tambahan (opsional)" />
                 </div>

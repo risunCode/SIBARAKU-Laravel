@@ -2,33 +2,31 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
-     * Creates minimal admin user for fresh installation.
+     * Seed the users table with admin user.
      */
     public function run(): void
     {
-        // Admin user
-        $admin = User::create([
-            'name' => 'Administrator SIBARAKU',
+        $this->command->info('👤 Creating admin user...');
+
+        // Create admin user
+        User::create([
+            'name' => 'Administrator',
             'email' => 'admin@inventaris.com',
             'password' => Hash::make('panelsibaraku'),
-            'phone' => '+6281234567890',
-            'birth_date' => '1990-01-01',
-            'is_active' => true,
-            'security_setup_completed' => true,
             'role' => 'admin',
+            'is_active' => true,
+            'security_setup_completed' => false,
         ]);
 
-        $this->command->info('✅ Admin user created successfully');
-        $this->command->info("   Email: admin@inventaris.com");
-        $this->command->info("   Password: panelsibaraku");
-        $this->command->info("   Security Setup: Completed (default)");
+        $this->command->info('✅ Admin user created');
+        $this->command->info('   Email: admin@inventaris.com');
+        $this->command->info('   Password: panelsibaraku');
     }
 }

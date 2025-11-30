@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ActivityLog;
 use App\Models\Commodity;
 use App\Models\Location;
+use App\Models\ReportSignature;
 use App\Models\Transfer;
 use App\Models\User;
 use App\Notifications\TransferRequested;
@@ -139,7 +140,7 @@ class TransferController extends Controller implements HasMiddleware
      */
     public function show(Transfer $transfer): View
     {
-        $transfer->load(['commodity.images', 'fromLocation', 'toLocation', 'requester', 'approver']);
+        $transfer->load(['commodity.images', 'fromLocation', 'toLocation', 'requester', 'approver', 'signature']);
         return view('transfers.show', compact('transfer'));
     }
 
@@ -208,6 +209,31 @@ class TransferController extends Controller implements HasMiddleware
         $transfer->update([
             'status' => 'completed',
             'transfer_date' => now(),
+        ]);
+
+        // Generate digital signature for verification
+        $content = $transfer->commodity_id . '|' . $transfer->from_location_id . '|' . $transfer->to_location_id . '|' . $transfer->status . '|' . $transfer->transfer_date;
+        $signatureHash = ReportSignature::generateSignature($content, 'transfer', $transfer->id, Auth::id());
+        $contentHash = ReportSignature::generateContentHash($content);
+        
+        ReportSignature::create([
+            'signable_type' => 'transfer',
+            'signable_id' => $transfer->id,
+            'user_id' => Auth::id(),
+            'signature_hash' => $signatureHash,
+            'content_hash' => $contentHash,
+            'signed_at' => now(),
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'metadata' => [
+                'report_type' => 'transfer',
+                'commodity_name' => $transfer->commodity->name ?? 'Unknown',
+                'from_location' => $transfer->fromLocation->name ?? 'Unknown',
+                'to_location' => $transfer->toLocation->name ?? 'Unknown',
+                'transfer_date' => $transfer->transfer_date,
+                'completed_by' => Auth::user()->name,
+            ],
+            'is_valid' => true,
         ]);
 
         // Activity logged;

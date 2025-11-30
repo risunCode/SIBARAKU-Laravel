@@ -116,7 +116,7 @@
                             <span class="badge {{ $code->status_badge_class }}">{{ $code->status_label }}</span>
                         </td>
                         <td class="px-4 py-3 text-xs" style="color: var(--text-secondary);">
-                            {{ $code->creator->name }}<br>
+                            {{ $code->creator?->name ?? '-' }}<br>
                             {{ $code->created_at->format('d M Y') }}
                         </td>
                         <td class="px-4 py-3">
@@ -407,8 +407,9 @@
             };
             
             try {
-                const res = await fetch(`/kode-referral/${id}`, {
+                const res = await fetch(`/admin/kode-referral/${id}`, {
                     method: 'PUT',
+                    credentials: 'include',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json',
@@ -443,8 +444,9 @@
             if (!result.isConfirmed) return;
             
             try {
-                const res = await fetch(`/kode-referral/${id}/toggle`, {
+                const res = await fetch(`/admin/kode-referral/${id}/toggle`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json',
@@ -477,8 +479,9 @@
             if (!result.isConfirmed) return;
             
             try {
-                const res = await fetch(`/kode-referral/${id}`, {
+                const res = await fetch(`/admin/kode-referral/${id}`, {
                     method: 'DELETE',
+                    credentials: 'include',
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'Accept': 'application/json',

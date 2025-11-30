@@ -39,7 +39,7 @@
             
             <!-- Logo -->
             <div class="flex items-center gap-3 h-16 px-6 border-b border-gray-200">
-                <img src="/images/logo-pbj-kalbar.png?v={{ time() }}" alt="Logo" class="w-8 h-8 object-contain">
+                <img src="/images/logo-pbj-kalbar.png" alt="Logo" class="w-8 h-8 object-contain">
                 <span class="font-semibold text-gray-900">Inventaris</span>
             </div>
 
@@ -222,12 +222,9 @@
                                     Kode Referral Saya
                                 </a>
                                 @endcan
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                                        Keluar
-                                    </button>
-                                </form>
+                                <button type="button" class="logout-button w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                    Keluar
+                                </button>
                             </div>
                         </div>
                     </div>

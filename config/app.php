@@ -133,6 +133,18 @@ return [
     |
     */
 
-    'version' => '1.0.0',
+    'version' => '1.1.1-public',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Digital Signature Key
+    |--------------------------------------------------------------------------
+    |
+    | This key is used for generating digital signatures for report verification.
+    | Keep this key secure and never expose it in client-side code.
+    |
+    */
+
+    'signature_key' => env('SIGNATURE_KEY'),
 
 ];
