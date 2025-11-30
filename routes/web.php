@@ -71,6 +71,9 @@ Route::middleware('auth')->group(function () {
     Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::put('profile/security', [ProfileController::class, 'updateSecurity'])->name('profile.security');
 
+    // Password Reset for Authenticated Users
+    Route::get('reset-password', [PasswordResetController::class, 'create'])->name('password.reset.auth');
+
     // Notifications
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
