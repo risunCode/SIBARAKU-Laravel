@@ -1,7 +1,7 @@
 -- ============================================================
 -- SIBARAKU - Sistem Inventaris Barang Kabupaten Kubu Raya
 -- Full Database Schema
--- Version: 1.0.0-public
+-- Version: 1.1.2-public-hotfix
 -- Generated: November 30, 2025
 -- ============================================================
 -- 
@@ -499,7 +499,36 @@ INSERT INTO `migrations` (`migration`, `batch`) VALUES
 ('2025_11_27_164600_create_referral_code_usage_table', 1),
 ('2025_11_27_164700_add_role_to_users_table', 1),
 ('2025_11_28_094213_rename_maintenance_logs_to_maintenances', 1),
-('2025_11_29_213753_add_attachment_to_disposals_table', 1);
+('2025_11_29_213753_add_attachment_to_disposals_table', 1),
+('2025_11_30_121811_fix_disposal_status_enum', 1),
+('2025_11_30_123917_create_report_signatures_table', 1);
+
+-- ============================================================
+-- Table: report_signatures
+-- Description: Digital signatures for reports (PDF verification)
+-- ============================================================
+DROP TABLE IF EXISTS `report_signatures`;
+CREATE TABLE `report_signatures` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `signable_type` VARCHAR(255) NOT NULL COMMENT 'disposal, maintenance, transfer',
+    `signable_id` BIGINT UNSIGNED NOT NULL,
+    `user_id` BIGINT UNSIGNED NOT NULL,
+    `signature_hash` VARCHAR(255) NOT NULL,
+    `content_hash` VARCHAR(255) NOT NULL,
+    `signed_at` TIMESTAMP NOT NULL,
+    `ip_address` VARCHAR(255) NULL DEFAULT NULL,
+    `user_agent` TEXT NULL DEFAULT NULL,
+    `metadata` JSON NULL DEFAULT NULL,
+    `is_valid` TINYINT(1) NOT NULL DEFAULT 1,
+    `created_at` TIMESTAMP NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `report_signatures_signature_hash_unique` (`signature_hash`),
+    KEY `report_signatures_signable_type_signable_id_index` (`signable_type`, `signable_id`),
+    KEY `report_signatures_user_id_index` (`user_id`),
+    KEY `report_signatures_is_valid_index` (`is_valid`),
+    CONSTRAINT `report_signatures_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
 COMMIT;
@@ -529,7 +558,8 @@ COMMIT;
 -- 17. notifications          - System notifications
 -- 18. referral_codes         - Registration referral codes
 -- 19. referral_code_usage    - Referral code usage tracking
--- 20. migrations             - Laravel migration tracking
+-- 20. report_signatures      - Digital signatures for PDF reports
+-- 21. migrations             - Laravel migration tracking
 --
--- Total: 20 tables
+-- Total: 21 tables
 -- ============================================================

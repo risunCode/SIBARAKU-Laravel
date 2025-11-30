@@ -1,6 +1,6 @@
 -- ============================================================
 -- SIBARAKU - Database Schema for DrawDB
--- Version: 1.0.0-public
+-- Version: 1.1.2-public-hotfix
 -- ============================================================
 
 -- Table: users
@@ -297,6 +297,25 @@ CREATE TABLE `referral_code_usage` (
     PRIMARY KEY (`id`)
 );
 
+-- Table: report_signatures
+CREATE TABLE `report_signatures` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `signable_type` VARCHAR(255) NOT NULL,
+    `signable_id` BIGINT UNSIGNED NOT NULL,
+    `user_id` BIGINT UNSIGNED NOT NULL,
+    `signature_hash` VARCHAR(255) NOT NULL,
+    `content_hash` VARCHAR(255) NOT NULL,
+    `signed_at` TIMESTAMP NOT NULL,
+    `ip_address` VARCHAR(255) NULL,
+    `user_agent` TEXT NULL,
+    `metadata` JSON NULL,
+    `is_valid` TINYINT(1) NOT NULL DEFAULT 1,
+    `created_at` TIMESTAMP NULL,
+    `updated_at` TIMESTAMP NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE (`signature_hash`)
+);
+
 -- ============================================================
 -- Foreign Key Relationships
 -- ============================================================
@@ -341,6 +360,9 @@ ALTER TABLE `referral_codes` ADD FOREIGN KEY (`created_by`) REFERENCES `users` (
 -- referral_code_usage relationships
 ALTER TABLE `referral_code_usage` ADD FOREIGN KEY (`referral_code_id`) REFERENCES `referral_codes` (`id`) ON DELETE CASCADE;
 ALTER TABLE `referral_code_usage` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+-- report_signatures.user_id -> users.id
+ALTER TABLE `report_signatures` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT;
 
 -- sessions.user_id -> users.id (optional, no strict FK)
 -- ALTER TABLE `sessions` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
